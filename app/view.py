@@ -16,7 +16,10 @@ def index(request):
 
 
 def classes(request):
-    class_list = mysql_result('select id,class_name from class')
+    # class_list = mysql_result('select id,class_name from class')
+    obj = Mysql_Connet()
+    class_list = obj.mysql_result('select id,class_name from class',[])
+    obj.mysql_colse()
     return render(request,'classes.html',{"classes_list":class_list})
 
 
@@ -76,8 +79,11 @@ def edit_teacher(request):
         return redirect('/teacher/')
 
 def student(request):
-    student_list = mysql_result('select student.id,student.stu_name,class.class_name from student left join class on student.class_id = class.id')
-    return render(request,'student.html',{'student_list':student_list})
+    obj = Mysql_Connet()
+    student_list = obj.mysql_result('select student.id,student.stu_name,class.class_name,class.id as clsid from student left join class on student.class_id = class.id',[])
+    class_list = obj.mysql_result('select id,class_name from class',[])
+    obj.mysql_colse()
+    return render(request,'student.html',{'student_list':student_list,'class_list':class_list})
 
 def add_student(request):
     if request.method == "GET":
@@ -130,7 +136,6 @@ def modal_edit_class(request):
     try:
         class_name = request.POST.get('class_name')
         nid = request.POST.get('nid')
-        print('nid = {},  class_name = {}'.format(nid,class_name))
         if len(class_name)>0:
             mysql_commit('update class set class_name=%s where id=%s',[class_name,nid,])
         else:
@@ -145,8 +150,8 @@ def modal_edit_class(request):
 
 def modal_del_class(request):
     ret = {'status':True,'message':None}
+    message_erro = "处理erro"
     try:
-        message_erro="处理erro"
         nid = request.POST.get('nid')
         mysql_commit('delete from class where id=%s',[nid,])
     except Exception as e:
@@ -154,3 +159,52 @@ def modal_del_class(request):
         ret['message'] = message_erro
 
     return HttpResponse(json.dumps(ret))
+
+
+
+
+def modal_add_student(request):
+    ret = {"status":True,'message':None}
+    message_erro = "处理erro"
+    try:
+        stu_name = request.POST.get('stu_name')
+        class_id = request.POST.get('class_id')
+        if len(stu_name)>0:
+            obj = Mysql_Connet()
+            obj.mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[stu_name,class_id,])
+            obj.mysql_colse()
+
+        else:
+            message_erro = "学生姓名不能为空"
+            raise Exception()
+    except Exception as e:
+        ret['status'] = False
+
+    ret['message'] = message_erro
+    return HttpResponse(json.dumps(ret))
+
+def modal_edit_student(request):
+    ret = {'status':True,'message':None}
+    message_erro = "处理erro"
+    try:
+
+        stu_id = request.POST.get('stu_id')
+        stu_name = request.POST.get('stu_name')
+        class_id = request.POST.get('class_id')
+        print(stu_id,stu_name ,class_id)
+        if len(stu_name)>0:
+            obj = Mysql_Connet()
+            obj.mysql_commit('update student set stu_name=%s,class_id=%s where id=%s ', [stu_name, class_id, stu_id,])
+            obj.mysql_colse()
+
+        else:
+            message_erro = "学生姓名不能为空"
+            raise Exception()
+    except Exception as e:
+        ret['status'] = False
+
+    ret['message'] = message_erro
+    return HttpResponse(json.dumps(ret))
+
+def modal_del_student(request):
+    pass

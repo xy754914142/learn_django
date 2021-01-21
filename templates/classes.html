@@ -141,7 +141,7 @@
                 url:'/modal_del_class/',
                 type:'POST',
                 dataType:'JSON',
-                data:{'nid':$('#del_id').val()},
+                data:{'nid':$('#del_id').text()},
                 success:function (arg) {
                     if(arg.status){
                         location.reload();
