@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+</head>
+<body>
+    <h1>学生信息</h1>
+    <p><a href="/add_student/">添加</a></p>
+    <table>
+        <thead>
+        <tr>
+            <td>ID</td>
+            <td>学生名称</td>
+            <td>班级名称</td>
+            <td>操作</td>
+        </tr>
+        </thead>
+        <tbody>
+                {% for student in student_list %}
+                <tr>
+                    <td> {{ student.id }} </td>
+                    <td> {{ student.stu_name }} </td>
+                    <td> {{ student.class_name }} </td>
+                    <td> <a href="/edit_student/?nid={{ student.id }}">编辑 |</a> </td>
+                    <td> <a href="/del_student/?nid={{ student.id }}">删除</a> </td>
+                </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

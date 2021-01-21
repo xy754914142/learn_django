@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link href="/static/myStylesheet.css" rel="stylesheet" type="text/css" />
+
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+
+<h1>班级列表</h1>
+<a href="/add_class/">添加</a>
+<a id="show_add">对话框添加</a>
+    <table>
+    <thead>
+    <tr>
+        <td>ID</td>
+        <td>班级名</td>
+        <td>操作</td>
+
+    </tr>
+    </thead>
+    <tbody>
+        {% for row in classes_list %}
+        <tr>
+        <td>{{ row.id }}</td>
+        <td>{{ row.class_name }}</td>
+        <td><a href="/edit_class/?postid={{ row.id  }}">编辑</a>
+             |
+        <a class="show_edit">对话框编辑</a>
+            |
+        <a href="/del_class/?nid={{ row.id }}">删除</a>
+             |
+        <a class="show_del">对话框删除</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+    </table>
+
+    <div id="shadow" class="shadow hide"></div>
+
+    <div id="modal" class="modal hide">
+        <div style="margin:20px 20px">
+            班级名称：<input type="text" id="class_name"/>
+            <input type="button" value="提交" id="add_submit"/>
+            <input type="button" value="取消" class="cancel_btn"/>
+            <p id="error_msg" style="color: red;"></p>
+        </div>
+    </div>
+
+    <div id="edit_modal" class="modal hide">
+        <div style="margin:20px 20px">
+            <span id="nid" style="display:none;"></span>
+            班级名称：<input type="text" id="edit_class_name"/>
+            <input type="button" value="修改" id="change_submit"/>
+            <input type="button" value="取消" class="cancel_btn"/>
+            <p id="error_msg_edit" style="color: red;"></p>
+        </div>
+    </div>
+
+    <div id="del_modal" class="modal hide">
+        <div style="margin:20px 20px">
+            <p id="del_id" style="display: none"></p>
+            <p id = 'del_name'></p>
+            <input type="button" value="删除" id="del_btn"/>
+            <input type="button" value="取消" class="cancel_btn"/>
+            <p id="error_msg_del" style="color: red;"></p>
+        </div>
+    </div>
+
+<script src="/static/jquery-3.5.1.js"></script>
+<script>
+    $(function () {
+        $('.cancel_btn').click(function () {
+            $('.shadow').addClass('hide');
+            $('.modal').addClass('hide');
+
+        })
+
+        $('#show_add').click(function () {
+            document.getElementById("shadow").classList.remove('hide');
+            document.getElementById('modal').classList.remove('hide')
+        })
+        $('#add_submit').click(function () {
+            $.ajax({
+                url:'/modal_add_class/',
+                type:'POST',
+                data:{'class_name':$('#class_name').val()},
+                dataType:"JSON",
+                success:function (args) {
+                    {#args = JSON.parse(args)#}
+                    console.log(args)
+                    if(args.status){
+                        location.reload();
+                    }else{
+                        $('#error_msg').text(args.message);
+                    }
+                }
+            })
+        })
+
+        $('.show_edit').click(function () {
+            $('#edit_modal').removeClass('hide');
+            $('#shadow').removeClass('hide');
+            p_all = $(this).parent().prevAll()
+            nid = $(p_all[1]).text();
+            class_name = $(p_all[0]).text();
+            $('#nid').text(nid);
+            $('#edit_class_name').val(class_name);
+        })
+        $('#change_submit').click(function () {
+            $.ajax({
+                url:'/modal_edit_class/',
+                type:'POST',
+                dataType:'JSON',
+                data:{'nid':$('#nid').text(),'class_name':$('#edit_class_name').val()},
+                success:function (arg) {
+                    if(arg.status){
+                        location.reload();
+                    }else{
+                        $('#error_msg_edit').text(arg.message);
+                    }
+                }
+            })
+        })
+
+        $('.show_del').click(function () {
+            $('#shadow').removeClass('hide');
+            $('#del_modal').removeClass('hide');
+            c_all = $(this).parent().prevAll();
+            $('#del_id').text($(c_all[1]).text())
+            str_class = '是否删除名为：'+$( c_all[0]).text() +'的班级'
+            $('#del_name').text(str_class)
+        })
+        $('#del_btn').click(function () {
+            $.ajax({
+                url:'/modal_del_class/',
+                type:'POST',
+                dataType:'JSON',
+                data:{'nid':$('#del_id').val()},
+                success:function (arg) {
+                    if(arg.status){
+                        location.reload();
+                    }else{
+                        $('#error_msg_del').val(arg.message);
+                    }
+                }
+            })
+        })
+    })
+    
+
+
+    
+
+
+</script>
+</body>
+</html>
