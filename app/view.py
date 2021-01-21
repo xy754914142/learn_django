@@ -191,7 +191,6 @@ def modal_edit_student(request):
         stu_id = request.POST.get('stu_id')
         stu_name = request.POST.get('stu_name')
         class_id = request.POST.get('class_id')
-        print(stu_id,stu_name ,class_id)
         if len(stu_name)>0:
             obj = Mysql_Connet()
             obj.mysql_commit('update student set stu_name=%s,class_id=%s where id=%s ', [stu_name, class_id, stu_id,])
@@ -207,4 +206,16 @@ def modal_edit_student(request):
     return HttpResponse(json.dumps(ret))
 
 def modal_del_student(request):
-    pass
+    ret = {'status':True,'message':None}
+    message_erro = '处理erro'
+    try:
+        stu_id = request.POST.get('nid')
+        obj = Mysql_Connet()
+        obj.mysql_commit('delete from student where id=%s',[stu_id,])
+        obj.mysql_colse()
+    except Exception as e:
+        message_erro = "删除失败请稍后再试！"
+        ret['status'] = False
+
+    ret['message']=message_erro
+    return HttpResponse(json.dumps(ret))

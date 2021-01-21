@@ -55,7 +55,7 @@
                          |
                         <a href="/del_student/?nid={{ student.id }}">删除</a>
                          |
-                        <a>对话框删除</a>
+                        <a class="del_maodal_show">对话框删除</a>
                     </td>
 
                 </tr>
@@ -91,6 +91,17 @@
         <input type="button" class="cancel_btn" value="取消"/>
         <p style="color:red" id="edit_erro"></p>
     </div>
+</div>
+
+<div class="modal hide" id="modal_window_del">
+    <div style="margin-left: 10px;margin-top:50px">
+        <h3>正在删除</h3>
+        <p>ID:<span id="del_stu_id"></span>班级:<span id="del_class_name"></span>姓名:<span id="del_stu_name"></span> 的学生！</p>
+        <input type="button" id="del_button" value="删除"/>
+        <input type="button" class="cancel_btn" value="取消"/>
+        <p id="del_erro" style="display: none"></p>
+    </div>
+
 </div>
 
 <script src="/static/jquery-3.5.1.js/"></script>
@@ -149,6 +160,35 @@
                 }
             })
         })
+
+        $('.del_maodal_show').click(function (){
+            $('#shadow_window').removeClass('hide');
+            $('#modal_window_del').removeClass('hide');
+            arg = $(this).parent().prevAll();
+            class_name=$(arg[0]).text();
+            name = $(arg[1]).text();
+            nid= $(arg[2]).text();
+            $('#del_stu_id').text(nid);
+            $('#del_stu_name').text(name);
+            $('#del_class_name').text(class_name);
+        })
+
+        $('#del_button').click(function(){
+            $.ajax({
+                url:'/modal_del_student/',
+                type:'POST',
+                dataType:'JSON',
+                data:{'nid':$('#del_stu_id').text()},
+                success:function (arg){
+                    if(arg.status){
+                        location.reload();
+                    }else{
+                        $('#del_erro').text(arg.message);
+                    }
+                }
+            })
+        })
+
     })
 </script>
 </body>
