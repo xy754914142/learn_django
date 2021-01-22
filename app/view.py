@@ -50,8 +50,21 @@ def edit_class(request):
         return redirect('/classes/')
 
 def teacher(request):
-    teacher_list = mysql_result('select id,th_name from teacher')
-    return render(request,'teacher.html',{'teacher_list':teacher_list})
+    obj = Mysql_Connet()
+    teacher_list = obj.mysql_result('select teacher.id as t_id, teacher.th_name,class.class_name from teacher left join relationship on teacher.id=relationship.t_id left join class on relationship.c_id= class.id',[])
+    teacher_lists = {}
+    for teacher_i in teacher_list:
+        tid = teacher_i['t_id']
+
+        if  tid in teacher_lists:
+            teacher_lists[tid]['classes_names'].append(teacher_i['class_name'])
+
+        else:
+            teacher_lists[tid]={'t_id':teacher_i['t_id'],'th_name':teacher_i['th_name'],'classes_names':[teacher_i['class_name'],]}
+
+    class_list = obj.mysql_result('select * from class',[])
+    obj.mysql_colse()
+    return render(request,'teacher.html',{'teacher_list':teacher_lists.values(),'class_list':class_list})
 
 def add_teacher(request):
     if request.method == 'GET':
@@ -219,3 +232,11 @@ def modal_del_student(request):
 
     ret['message']=message_erro
     return HttpResponse(json.dumps(ret))
+
+
+def modal_add_teacher(request):
+    pass
+def modal_edit_teacher(request):
+    pass
+def modal_del_teacher(request):
+    pass
