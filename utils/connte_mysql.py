@@ -63,6 +63,18 @@ class Mysql_Connet():
         self.conn.commit()
         return result
 
+    def mysql_commit_return_id(self,sql,value):
+
+        self.cursor.execute(sql,value)
+        self.conn.commit()
+        id = self.cursor.lastrowid
+        return id
+
+
+    def mysql_many_commit(self,sql,value):
+        self.cursor.executemany(sql,value)
+        self.conn.commit()
+
     def mysql_colse(self):
         self.cursor.close()
         self.conn.close()

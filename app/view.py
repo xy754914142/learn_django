@@ -49,47 +49,6 @@ def edit_class(request):
         mysql_commit("update class set class_name = %s where id = %s",[class_name,nid,])
         return redirect('/classes/')
 
-def teacher(request):
-    obj = Mysql_Connet()
-    teacher_list = obj.mysql_result('select teacher.id as t_id, teacher.th_name,class.class_name from teacher left join relationship on teacher.id=relationship.t_id left join class on relationship.c_id= class.id',[])
-    teacher_lists = {}
-    for teacher_i in teacher_list:
-        tid = teacher_i['t_id']
-
-        if  tid in teacher_lists:
-            teacher_lists[tid]['classes_names'].append(teacher_i['class_name'])
-
-        else:
-            teacher_lists[tid]={'t_id':teacher_i['t_id'],'th_name':teacher_i['th_name'],'classes_names':[teacher_i['class_name'],]}
-
-    class_list = obj.mysql_result('select * from class',[])
-    obj.mysql_colse()
-    return render(request,'teacher.html',{'teacher_list':teacher_lists.values(),'class_list':class_list})
-
-def add_teacher(request):
-    if request.method == 'GET':
-        return render(request,'add_teacher.html')
-    else:
-        v = request.POST.get('teacher_name')
-        mysql_commit('insert into teacher(th_name) values(%s)',[v,])
-        return redirect('/teacher/')
-
-def del_teacher(request):
-    nid = request.GET.get('nid')
-    mysql_commit('delete from teacher where id=%s',[nid,])
-    return redirect('/teacher/')
-
-
-def edit_teacher(request):
-    if request.method == 'GET':
-        nid = request.GET.get('nid')
-        teach_date = mysql_fetchone('select id,th_name from teacher where id = %s',[nid,])
-        return render(request, 'edit_teacher.html',{'teach_date':teach_date})
-    else:
-        nid = request.GET.get('nid')
-        name = request.POST.get('name')
-        mysql_commit("update teacher set th_name = %s where id = %s",[name,nid,])
-        return redirect('/teacher/')
 
 def student(request):
     obj = Mysql_Connet()
@@ -234,8 +193,38 @@ def modal_del_student(request):
     return HttpResponse(json.dumps(ret))
 
 
+def teacher(request):
+    obj = Mysql_Connet()
+    teacher_list = obj.mysql_result('select teacher.id as t_id, teacher.th_name,class.class_name from teacher left join relationship on teacher.id=relationship.t_id left join class on relationship.c_id= class.id',[])
+    teacher_lists = {}
+    for teacher_i in teacher_list:
+        tid = teacher_i['t_id']
+
+        if  tid in teacher_lists:
+            teacher_lists[tid]['classes_names'].append(teacher_i['class_name'])
+
+        else:
+            teacher_lists[tid]={'t_id':teacher_i['t_id'],'th_name':teacher_i['th_name'],'classes_names':[teacher_i['class_name'],]}
+
+    class_list = obj.mysql_result('select * from class',[])
+    obj.mysql_colse()
+    return render(request,'teacher.html',{'teacher_list':teacher_lists.values(),'class_list':class_list})
+
+
 def modal_add_teacher(request):
-    pass
+    obj = Mysql_Connet()
+    if request.method == "GET":
+        class_list = obj.mysql_result('select id,class_name from class',[])
+        return render(request,'add_teacher.html',{'class_list':class_list})
+    else:
+        t_name = request.POST.get('teacher_name')
+        add_class_list = request.POST.getlist('selete_class_id')
+
+        t_id = obj.mysql_commit_return_id('insert into teacher(th_name) values(%s)',[t_name,])
+
+
+        return HttpResponse(t_id)
+
 def modal_edit_teacher(request):
     pass
 def modal_del_teacher(request):

@@ -6,10 +6,17 @@
 </head>
 <body>
     <h1>添加教师</h1>
-    <form method="post" action="/add_teacher/">
-    教师名：
-    <input type="text" name="teacher_name">
-    <input type="submit" content="提交">
+    <form method="post" action="/modal_add_teacher/">
+        教师名：
+        <input type="text" name="teacher_name">
+        <p>
+            <select multiple="multiple" name="selete_class_id" style="height: 150px">
+                {% for row_class in class_list %}
+                <option value="{{ row_class.id }}">{{ row_class.class_name }}</option>
+                {% endfor %}
+            </select>
+        <input type="submit" content="提交">
+        </p>
     </form>
 </body>
 </html>

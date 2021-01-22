@@ -32,8 +32,7 @@
 </head>
 <body>
     <h1>教师列表</h1>
-    <a href="/add_teacher/">添加</a>
-    <a id="show_add_modal">对话框添加</a>
+    <a href="/modal_add_teacher/">添加</a>
     <table border="1">
         <thead>
         <tr>
@@ -49,7 +48,7 @@
                     <td>{{ rows.t_id }}</td>
                     <td>{{ rows.th_name }}</td>
                     <td>{% for class_name in rows.classes_names %}
-                        <span style="border:1px solid red;margin:2px">{{ class_name }}</span>
+                        <span style="border:1px solid red;display: inline-block;padding: 5px">{{ class_name }}</span>
                         {% endfor %}
                     </td>
                     <td><a href="/edit_teacher/?nid={{ rows.t_id  }}">编辑 |</a></td>
@@ -63,13 +62,6 @@
     <div class="modal hide" id="add_modal">
         <div style="margin:20px">
             <p>教师名称:<input type="text" id="add_t_name"/></p>
-            <p>
-                <select multiple="multiple">
-                    {% for row_class in class_list %}
-                    <option value="{{ row_class.id }}">{{ row_class.class_name }}</option>
-                    {% endfor %}
-                </select>
-            </p>
             <input type="button" id="add_btu" value="添加"/>
             <input type="button" class="cancel" value="取消"/>
         </div>
@@ -81,18 +73,17 @@
             $('.shadow').addClass('hide');
             $('.modal').addClass('hide');
         })
-        $('#show_add_modal').click(function () {
-            $('.shadow').removeClass('hide');
-            $('#add_modal').removeClass('hide');
-        })
+
         $('#add_btu').click(function () {
+            class_id_s = $('#selete_class_id').val()
+            console.log(class_id_s)
             $.ajax({
                 url:'/modal_add_teacher/',
                 type:'POST',
                 dataType:'JSON',
-                data:{},
+                data:{'stu_name':$('#add_t_name').val(),'class_id':class_id_s},
                 success:function (arg) {
-
+                    console.log(arg);
                 }
             })
         })
