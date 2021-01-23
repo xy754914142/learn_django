@@ -60,9 +60,10 @@
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
               <button type="button" class="btn btn-default" id="sign_btn">Sign in</button>
+              <label style="color:red;margin-left: 100px" id="message"></label>
             </div>
-            <label class="col-sm-2 control-label" id="message"></label>
           </div>
+
     </div>
     </div>
 
@@ -75,8 +76,9 @@
 <script src="/static/jquery-3.5.1.js"></script>
 <script>
     $(function () {
-        Bindinput();
         Bindsign_btn();
+        Bindinput();
+
     })
 
     function Bindinput() {
@@ -120,13 +122,13 @@
         $('#sign_btn').click(function () {
             $('.shadow .loading').removeClass('hide');
             $.ajax({
-                url:'//',
+                url:'/login/',
                 type:'POST',
                 dataType:'JSON',
-                data:{'username':$('#username').val(),'password':$('#password').val()}
+                data:{'username':$('#username').val(),'password':$('#password').val()},
                 success:function (arg) {
                     if(arg.status){
-                        location.href('/management/');
+                        location.href ='/management/';
                     }else{
                         $('#message').text(arg.message);
                     }

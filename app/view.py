@@ -11,9 +11,12 @@ def login(request):
         try:
             username = request.POST.get('username')
             password = request.POST.get('password')
+
+
             find_password = obj.mysql_fetchone('select password from userdata where username=%s',[username])
-            if find_password == password:
-                print(find_password)
+
+            if find_password['password'] != password:
+                raise Exception
         except Exception as e:
             ret['status'] = False
             ret['message']='登录失败！'
@@ -23,7 +26,7 @@ def login(request):
 
 
 def management(request):
-    pass
+    return render(request,'management.html')
 
 def classes(request):
     # class_list = mysql_result('select id,class_name from class')
