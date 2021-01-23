@@ -2,18 +2,28 @@ from django.shortcuts import render,redirect,HttpResponse
 from utils.connte_mysql import *
 import json
 
-def index(request):
+def login(request):
     if request.method == 'GET':
-        return render(
-            request,
-            'index.html'
-        )
+        return render(request,'login.html')
     else:
-        if request.POST.get('username') == 'root' and request.POST.get('password') == '123':
-            return redirect('/classes/')
-        else:
-            return render(request,'index.html',{'msg':'账号或密码错误！'})
+        ret = {'status':True,'message':None}
+        obj = Mysql_Connet()
+        try:
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            find_password = obj.mysql_fetchone('select password from userdata where username=%s',[username])
+            if find_password == password:
+                print(find_password)
+        except Exception as e:
+            ret['status'] = False
+            ret['message']='登录失败！'
 
+        obj.mysql_colse()
+        return HttpResponse(json.dumps(ret))
+
+
+def management(request):
+    pass
 
 def classes(request):
     # class_list = mysql_result('select id,class_name from class')

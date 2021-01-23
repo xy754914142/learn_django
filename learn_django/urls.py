@@ -21,7 +21,9 @@ from app import view
 
 
 urlpatterns = [
-    path('', view.index),
+    path('login/', view.login),
+    path('management/', view.management),
+
     path('classes/',view.classes),
     path('add_class/',view.add_class),
     path('del_class/', view.del_class),
