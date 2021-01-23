@@ -211,21 +211,126 @@ def teacher(request):
     return render(request,'teacher.html',{'teacher_list':teacher_lists.values(),'class_list':class_list})
 
 
-def modal_add_teacher(request):
+def add_teacher(request):
     obj = Mysql_Connet()
     if request.method == "GET":
         class_list = obj.mysql_result('select id,class_name from class',[])
+        obj.mysql_colse()
         return render(request,'add_teacher.html',{'class_list':class_list})
     else:
         t_name = request.POST.get('teacher_name')
         add_class_list = request.POST.getlist('selete_class_id')
-
+        print(add_class_list)
         t_id = obj.mysql_commit_return_id('insert into teacher(th_name) values(%s)',[t_name,])
+        t_2_c = []
+        for class_id in add_class_list:
+            t_2_c.append((t_id,class_id))
+        obj.mysql_many_commit('insert into relationship(t_id,c_id) values(%s,%s)',t_2_c)
+        obj.mysql_colse()
+        return redirect('/teacher/')
+
+def edit_teacher(request):
+    obj = Mysql_Connet()
+    if request.method == "GET":
+        class_list = obj.mysql_result('select id,class_name from class',[])
+        t_id = request.GET.get('nid')
+        t_name = obj.mysql_fetchone('select th_name from teacher where id=%s',[t_id])['th_name']
+        old_class_list = obj.mysql_result('select id,c_id from relationship where t_id=%s',[t_id,])
+        d_class_list=[]
+        for o_class in old_class_list:
+            d_class_list.append(o_class['c_id'])
+        return render(request,'edit_teacher.html',{'class_list':class_list,'t_name':t_name,'old_class_list':d_class_list,'t_id':t_id})
+    else:
+        t_id = request.GET.get('nid')
+        teacher_name = request.POST.get('teacher_name')
+        selete_class_id = request.POST.getlist('selete_class_id')
+        obj.mysql_commit('update teacher set th_name=%s where id=%s',[teacher_name,t_id])
+        new_class_2_teacher = [(t_id, class_id) for class_id in selete_class_id]
+        #方法一直接删除再添加
+        obj.mysql_commit('delete from relationship where t_id=%s',[t_id,])
+        obj.mysql_many_commit('insert into relationship(t_id,c_id) values(%s,%s)',new_class_2_teacher)
+        #方法二 对比后添加编辑 ??暂时不知道怎么做，先放着
+        # [{'id': 5, 'c_id': 2}, {'id': 6, 'c_id': 1}]
+        # old_class_list = obj.mysql_result('select id,c_id from relationship where t_id=%s',[t_id,])
+        # print(old_class_list)
+        # for new_c_id in selete_class_id:
+        #     for row in old_class_list:
+        #         if new_c_id == row['c_id']
+
+        obj.mysql_colse()
+        return redirect('/teacher/')
 
 
-        return HttpResponse(t_id)
+def del_teacher(request):
+    del_id = request.GET.get('nid')
+    obj = Mysql_Connet()
+    obj.mysql_commit('delete from teacher where id=%s',[del_id,])
+    obj.mysql_commit('delete from relationship where t_id=%s',[del_id,])
+    return redirect('/teacher/')
+
+def modal_add_teacher(request):
+    ret = {'status':True,'message':None}
+    obj = Mysql_Connet()
+    try:
+        t_name = request.POST.get('t_name')
+        class_id_list = request.POST.getlist('class_id_list')
+        t_id = obj.mysql_commit_return_id('insert into teacher(th_name) values(%s)',[t_name])
+        class_2_teacher = [(t_id,c_id) for c_id in class_id_list]
+        obj.mysql_many_commit('insert into relationship(t_id,c_id) values(%s,%s)',class_2_teacher)
+    except Exception as e:
+        ret['status']=False
+        ret['message']='添加失败'
+
+    obj.mysql_colse()
+    return HttpResponse(json.dumps(ret))
 
 def modal_edit_teacher(request):
-    pass
+    ret = {'status': True, 'message': None}
+    obj = Mysql_Connet()
+    try:
+        nid = request.POST.get('nid')
+        t_name = request.POST.get('t_name')
+        class_list = request.POST.getlist('class_list')
+        obj.mysql_commit('update teacher set th_name=%s where id=%s',[t_name,nid])
+        obj.mysql_commit('delete from relationship where t_id=%s',[nid])
+        class2teacher = [(nid,class_id) for class_id in class_list]
+        obj.mysql_many_commit('insert into relationship(t_id,c_id) values(%s,%s)',class2teacher)
+
+    except Exception as e:
+        ret['status'] = False
+        ret['message'] = '添加失败'
+
+    obj.mysql_colse()
+    return HttpResponse(json.dumps(ret))
+
 def modal_del_teacher(request):
-    pass
+    ret = {'status': True, 'message': None}
+    obj = Mysql_Connet()
+    try:
+        t_id = request.POST.get('nid')
+        obj.mysql_commit('delete from relationship where t_id=%s',[t_id])
+        obj.mysql_commit('delete from teacher where id=%s',[t_id])
+
+    except Exception as e:
+        ret['status'] = False
+        ret['message'] = '删除失败'
+
+    obj.mysql_colse()
+    return HttpResponse(json.dumps(ret))
+
+
+def get_class_list(request):
+    obj = Mysql_Connet()
+    class_list = obj.mysql_result('select id,class_name from class',[])
+    obj.mysql_colse()
+    return HttpResponse(json.dumps(class_list))
+
+def get_teacher2class_list(request):
+    nid = request.POST.get('nid')
+    obj = Mysql_Connet()
+    class_list = obj.mysql_result('select c_id from relationship where t_id=%s',[nid])
+    obj.mysql_colse()
+    a = []
+    for i in class_list:
+        a.append(i['c_id'])
+    return HttpResponse(json.dumps(a))

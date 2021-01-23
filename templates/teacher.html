@@ -28,11 +28,23 @@
         .hide{
             display:none;
         }
+        .loading{
+            position:fixed;
+            width:124px;
+            height:124px;
+            left:50%;
+            top:50%;
+            margin-top: -62px;
+            margin-left:-62px;
+            z-index: 1000;
+            background-image:url('/static/image/load.gif');
+        }
     </style>
 </head>
 <body>
     <h1>教师列表</h1>
-    <a href="/modal_add_teacher/">添加</a>
+    <a href="/add_teacher/">添加</a>
+    <a id="show_add_modal">对话框添加</a>
     <table border="1">
         <thead>
         <tr>
@@ -51,43 +63,205 @@
                         <span style="border:1px solid red;display: inline-block;padding: 5px">{{ class_name }}</span>
                         {% endfor %}
                     </td>
-                    <td><a href="/edit_teacher/?nid={{ rows.t_id  }}">编辑 |</a></td>
-                    <td><a href="/del_teacher/?nid={{ rows.t_id  }}">删除</a></td>
+                    <td>
+                        <a href="/edit_teacher/?nid={{ rows.t_id  }}">编辑</a>|
+                        <a class="show_edit_modal">编辑框编辑</a>|
+                        <a href="/del_teacher/?nid={{ rows.t_id  }}">删除</a>
+                        <a class="show_del_modal">编辑框删除</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <div class="shadow hide"></div>
+    <div class="loading hide"></div>
     <div class="modal hide" id="add_modal">
         <div style="margin:20px">
-            <p>教师名称:<input type="text" id="add_t_name"/></p>
+            <p>教师名称:<input type="text" id="add_t_name" style="width: 100px"/></p>
+            <p>
+                <select multiple id="add_select" size="10" style="width: 100px">
+
+                </select>
+            </p>
             <input type="button" id="add_btu" value="添加"/>
             <input type="button" class="cancel" value="取消"/>
+            <p id="add_err"></p>
+        </div>
+    </div>
+
+    <div class="modal hide" id="edit_modal">
+        <div style="margin:20px">
+            <p id='edit_id' style="display: none"></p>
+            <p>教师名称:<input type="text" id="edit_t_name" style="width: 100px"/></p>
+            <p>
+                <select multiple id="edit_select" size="10" style="width: 100px">
+
+                </select>
+            </p>
+            <input type="button" id="edit_btu" value="修改"/>
+            <input type="button" class="cancel" value="取消"/>
+            <p id="edit_err"></p>
+        </div>
+    </div>
+
+    <div class="modal hide" id="del_modal">
+        <div style="margin:20px">
+            是否删除编号：<span id="del_id"></span>   教师名称:<span id="del_name"></span>
+            <p>任课班级:<span id="del_t_class"></span></p>
+            <input type="button" id="del_btn" value="删除"/>
+            <input type="button" class="cancel"  value="取消"/>
+            <p id="err_del"></p>
         </div>
     </div>
 <script src="/static/jquery-3.5.1.js"></script>
 <script>
     $(function () {
-        $('.cancel').click(function () {
-            $('.shadow').addClass('hide');
-            $('.modal').addClass('hide');
-        })
+        BindCancel();
+        Bindshow_add_modal();
+        Bindadd_btu();
+        Bindshow_edit_modal();
+        Bindedit_btu();
+        Bindshow_del_modal();
+        Binddel_btn();
+    })
 
+
+    function BindCancel() {
+        $('.cancel').click(function () {
+            $('.shadow,.modal').addClass('hide');
+        })
+    }
+    function Bindshow_add_modal() {
+        $('#show_add_modal').click(function () {
+            $('.shadow,.loading').removeClass('hide');
+            $.ajax({
+                url:'/get_class_list/',
+                type:'GET',
+                dataType:'JSON',
+                success:function (arg) {
+                    $.each(arg,function (i,row) {
+                        var tag = document.createElement('option');
+                        tag.innerHTML = row.class_name;
+                        tag.setAttribute('value',row.id);
+                        $('#add_select').append(tag);
+                    })
+                    $('.loading').addClass('hide');
+                    $('#add_modal').removeClass('hide');
+                }
+            })
+        })
+    }
+    function Bindadd_btu() {
         $('#add_btu').click(function () {
-            class_id_s = $('#selete_class_id').val()
-            console.log(class_id_s)
             $.ajax({
                 url:'/modal_add_teacher/',
                 type:'POST',
                 dataType:'JSON',
-                data:{'stu_name':$('#add_t_name').val(),'class_id':class_id_s},
+                data:{'t_name':$('#add_t_name').val(),'class_id_list':$('#add_select').val()},
+                traditional:true,
                 success:function (arg) {
-                    console.log(arg);
+                    if(arg.status){
+                        location.reload();
+                    }else{
+                        $('#add_err').text(arg.message);
+                    }
                 }
             })
         })
-    })
+    }
+    function Bindshow_edit_modal() {
+        $('.show_edit_modal').click(function () {
+            $('.shadow,.loading').removeClass('hide')
+            arg = $(this).parent().prevAll()
+            nid = $(arg[2]).text();
+            t_name = $(arg[1]).text();
+            $('#edit_t_name').val(t_name);
+            $('#edit_id').text(nid);
+            $('#edit_select').find('option').remove();
+            $.ajax({
+                url: '/get_teacher2class_list/',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {'nid': nid},
+                success: function (arg) {
+                     $.ajax({
+                            url:'/get_class_list/',
+                            type:'GET',
+                            dataType:'JSON',
+                            success:function (value) {
+                                $.each(value,function (i,row) {
+                                    var tag = document.createElement('option');
+                                    tag.innerHTML = row.class_name;
+                                    tag.setAttribute('value',row.id);
+                                    if(arg.indexOf(row.id) != -1){
+                                        tag.setAttribute('selected','selected');
+                                    }
+                                    $('#edit_select').append(tag);
+                                })
+                                $('.loading').addClass('hide');
+                                $('#edit_modal').removeClass('hide');
+                            }
+                        });
+                }
+            })
+
+
+        })
+
+    }
+    function Bindedit_btu() {
+        $('#edit_btu').click(function () {
+            $.ajax({
+                url:'/modal_edit_teacher/',
+                type:'POST',
+                dataType:'JSON',
+                data:{'nid':$('#edit_id').text(),'t_name':$('#edit_t_name').val(),'class_list':$('#edit_select').val()},
+                traditional:true,
+                success:function (arg) {
+                    if(arg.status){
+                        location.reload();
+                    }else{
+                        $('#edit_err').text(arg.message);
+                    }
+                }
+            })
+        })
+    }
+    function Bindshow_del_modal() {
+        $('.show_del_modal').click(function () {
+            $(".shadow,.loading").removeClass('hide');
+            arg = $(this).parent().prevAll();
+            nid = $(arg[2]).text();
+            t_name = $(arg[1]).text();
+            class_list = $(arg[0]).text();
+            $('#del_id').text(nid);
+            $('#del_name').text(t_name);
+            $('#del_t_class').text(class_list);
+            $(".loading").addClass('hide');
+            $('#del_modal').removeClass('hide');
+        })
+
+    }
+    function Binddel_btn() {
+        $('#del_btn').click(function () {
+            $.ajax({
+                url:'/modal_del_teacher/',
+                type:'POST',
+                dataType:'JSON',
+                data:{'nid':$('#del_id').text()},
+                success:function (arg) {
+                    if(arg.status){
+                        location.reload();
+                    }else{
+                        $('#err_del').text(arg.message);
+                    }
+                }
+
+            })
+        })
+    }
+
 </script>
 </body>
 </html>

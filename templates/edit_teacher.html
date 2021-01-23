@@ -2,14 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>编辑教师信息</title>
+    <title>编辑教师</title>
 </head>
 <body>
-<h1>编辑教师信息</h1>
-    <form method="post" action="/edit_teacher/?nid={{ teach_date.id }}">
-        <input type="text" name="name" value= {{ teach_date.th_name }}>
-        <input type="submit">
+    <h1>编辑教师</h1>
+    <form method="post" action="/edit_teacher/?nid={{ t_id }}">
+        教师名：
+        <input type="text" name="teacher_name" value="{{ t_name }}">
+        <p>
+            <select multiple="multiple" name="selete_class_id" style="height: 150px">
+                {% for row_class in class_list %}
+                    {% if row_class.id in old_class_list %}
+                        <option value="{{ row_class.id }}" selected>{{ row_class.class_name }}</option>
+                    {% else %}
+                        <option value="{{ row_class.id }}">{{ row_class.class_name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        <input type="submit" content="修改">
+        </p>
     </form>
-
 </body>
 </html>

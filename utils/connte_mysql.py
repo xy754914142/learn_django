@@ -72,6 +72,7 @@ class Mysql_Connet():
 
 
     def mysql_many_commit(self,sql,value):
+        #value是一个包含多个元组的数组
         self.cursor.executemany(sql,value)
         self.conn.commit()
 
