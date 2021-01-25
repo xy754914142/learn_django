@@ -1,20 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>添加学生</title>
-</head>
-<body>
-    <h1>添加学生</h1>
 
-    <form method="post" action="/add_student/">
-        姓名：<input type="text" name="name" />
-            <select name="class_id">
-                {% for class_i in class_list %}
-                    <option value={{ class_i.id }}>{{ class_i.class_name }}</option>
-                {% endfor %}
-            </select>
-        <input type="submit"/>
-    </form>
-</body>
-</html>
+{% extends 'management.html' %}
+{% block include-css %}
+{% endblock include-css %}
+
+{% block content %}
+    <ol class="breadcrumb">
+      <li><a href="#">Home</a></li>
+      <li><a href="/student/">学生列表</a></li>
+      <li class="active">添加学生</li>
+    </ol>
+    <div style="padding-left: 50px;">
+        <form method="post" action="/add_student/">
+            姓名：<input type="text" name="name" />
+                <select name="class_id">
+                    {% for class_i in class_list %}
+                        <option value={{ class_i.id }}>{{ class_i.class_name }}</option>
+                    {% endfor %}
+                </select>
+            <input type="submit"/>
+        </form>
+    </div>
+
+{% endblock content %}
+
+{% block include-js %}
+{% endblock include-js %}
+
+
+
+
+

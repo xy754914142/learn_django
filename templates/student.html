@@ -1,40 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>学生信息</title>
-    <style>
-        .shadow{
-            position: fixed;
-            top: 0;
-            bottom:0;
-            left: 0;
-            right:0;
-            background-color:black;
-            opacity:0.4;
-            z-index: 999;
-        }
-        .modal{
-            position:fixed;
-            left: 50%;
-            top:50%;
-            height:300px;
-            width: 400px;
-            margin-left: -200px;
-            margin-top:-150px;
-            background-color:white;
-            z-index:1000;
-        }
-        .hide{
-            display:none;
-        }
-    </style>
-</head>
-<body>
-    <h1>学生信息</h1>
-    <p><a href="/add_student/">添加</a></p>
-    <p><a id="add_modal">对话框添加</a></p>
-    <table>
+{% extends 'management.html' %}
+{% block include-css %}
+    <link rel="stylesheet" href="/static/css/mycss.css">
+{% endblock include-css %}
+
+{% block content %}
+    <ol class="breadcrumb">
+          <li><a href="/management/">Home</a></li>
+          <li class="active">学生列表</li>
+    </ol>
+    <div style="padding: 0 10px 10px 10px">
+    <p><a href="/add_student/" class="btn btn-info">添加</a>
+        <a id="add_modal" class="btn btn-primary">对话框添加</a></p>
+    </div>
+    <table  class="table table-bordered table-hover">
         <thead>
         <tr>
             <td>ID</td>
@@ -49,13 +27,13 @@
                     <td> {{ student.id }} </td>
                     <td> {{ student.stu_name }} </td>
                     <td clsid="{{ student.clsid }}"> {{ student.class_name }} </td>
-                    <td> <a href="/edit_student/?nid={{ student.id }}">编辑</a>
+                    <td> <a href="/edit_student/?nid={{ student.id }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                         |
-                        <a class="show_editWindow">对话框编辑</a>
+                        <a class="show_editWindow"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 对话框</a>
                          |
-                        <a href="/del_student/?nid={{ student.id }}">删除</a>
+                        <a href="/del_student/?nid={{ student.id }}"><i class="fa fa-trash" aria-hidden="true"></i></a>
                          |
-                        <a class="del_maodal_show">对话框删除</a>
+                        <a class="del_maodal_show"><i class="fa fa-trash" aria-hidden="true"></i> 对话框</a>
                     </td>
 
                 </tr>
@@ -63,8 +41,14 @@
         </tbody>
     </table>
 
+
+
+
+
+
 <div class="shadow hide" id="shadow_window"></div>
-<div class="modal hide" id="modal_window">
+
+<div class="mymodal hide" id="modal_window">
     <div style="margin-left: 50px;margin-top:50px">
     <p>学生姓名:<input type="text" id="add_student_name"/></p>
     班级名称:<select id="add_class_name">
@@ -78,7 +62,7 @@
     </div>
 </div>
 
-<div class="modal hide" id="modal_window_edit">
+<div class="mymodal hide" id="modal_window_edit">
     <div style="margin-left: 50px;margin-top:50px">
         <p id="edit_stu_id" style="display: none"></p>
         <p>学生名称：<input type="text" id="edit_stu_name"/></p>
@@ -93,7 +77,7 @@
     </div>
 </div>
 
-<div class="modal hide" id="modal_window_del">
+<div class="mymodal hide" id="modal_window_del">
     <div style="margin-left: 10px;margin-top:50px">
         <h3>正在删除</h3>
         <p>ID:<span id="del_stu_id"></span>班级:<span id="del_class_name"></span>姓名:<span id="del_stu_name"></span> 的学生！</p>
@@ -103,93 +87,8 @@
     </div>
 
 </div>
+{% endblock content %}
 
-<script src="/static/jquery-3.5.1.js/"></script>
-<script>
-    $(function () {
-        $('.cancel_btn').click(function () {
-            $('.modal').addClass('hide');
-            $('.shadow').addClass('hide');
-        })
-        
-        $('#add_modal').click(function () {
-            $('#shadow_window').removeClass('hide');
-            $('#modal_window').removeClass('hide');
-        })
-
-        $('#add_btn').click(function () {
-            $.ajax({
-                url:'/modal_add_student/',
-                type:'POST',
-                dataType:'JSON',
-                data:{'stu_name':$('#add_student_name').val(),'class_id':$('#add_class_name').val()},
-                success:function (arg) {
-                    if(arg.status){
-                        location.reload();
-                    }else{
-                        $('#error_mess_add').text(arg.message);
-                    }
-                }
-            })
-        })
-
-        $('.show_editWindow').click(function () {
-            $('#shadow_window').removeClass('hide');
-            $('#modal_window_edit').removeClass('hide');
-            arg = $(this).parent().prevAll();
-            stu_id = $(arg[2]).text()
-            stu_name = $(arg[1]).text();
-            clsid = $(arg[0]).attr('clsid');
-            $('#edit_stu_id').text(stu_id);
-            $('#select_class').val(clsid);
-            $('#edit_stu_name').val(stu_name);
-        })
-
-        $('#edit_btn').click(function () {
-            $.ajax({
-                url:'/modal_edit_student/',
-                type:'POST',
-                dataType:'JSON',
-                data:{'stu_id':$('#edit_stu_id').text(),'stu_name':$('#edit_stu_name').val(),'class_id':$('#select_class').val()},
-                success:function (arg) {
-                    if(arg.status){
-                        location.reload();
-                    }else{
-                        $('#edit_erro').text(arg.message);
-                    }
-                }
-            })
-        })
-
-        $('.del_maodal_show').click(function (){
-            $('#shadow_window').removeClass('hide');
-            $('#modal_window_del').removeClass('hide');
-            arg = $(this).parent().prevAll();
-            class_name=$(arg[0]).text();
-            name = $(arg[1]).text();
-            nid= $(arg[2]).text();
-            $('#del_stu_id').text(nid);
-            $('#del_stu_name').text(name);
-            $('#del_class_name').text(class_name);
-        })
-
-        $('#del_button').click(function(){
-            $.ajax({
-                url:'/modal_del_student/',
-                type:'POST',
-                dataType:'JSON',
-                data:{'nid':$('#del_stu_id').text()},
-                success:function (arg){
-                    if(arg.status){
-                        location.reload();
-                    }else{
-                        $('#del_erro').text(arg.message);
-                    }
-                }
-            })
-        })
-
-    })
-</script>
-</body>
-</html>
+{% block include-js %}
+    <script src="/static/js/student-js.js"></script>
+{% endblock include-js %}

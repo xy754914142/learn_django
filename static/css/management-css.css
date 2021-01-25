@@ -1,0 +1,83 @@
+body{
+    margin: 0;
+}
+.left1{
+    float:left;
+}
+.right1{
+    float:right;
+}
+.pg-header{
+    height: 48px;
+    min-width:1190px;
+    background-color: #204d74;
+    line-height: 48px;
+}
+.pg-header .logo{
+    color:white;
+    font-size: 18px;
+    text-align: center;
+    width: 200px;
+    border-right: 1px solid yellowgreen;
+}
+.pg-header .rmenus a{
+    display: inline-block;
+    color: white;
+    padding: 0 15px;
+}
+.pg-header .rmenus a:hover{
+    background-color: #2aabd2;
+}
+.pg-header .avatar{
+    padding: 0 15px;
+}
+.pg-header .avatar img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+.pg-header .avatar .user-info{
+    position: absolute;
+    width: 200px;
+    top: 48px;
+    right: 2px;
+    background-color: #080808;
+    color: white;
+    z-index: 100;
+    display: none;
+    background-color: white;
+    border: 1px solid #dddddd;
+}
+.pg-header .avatar:hover .user-info{
+    display: block;
+}
+.pg-header .avatar .user-info a{
+    display: block;
+    padding-left: 60px;
+}
+.pg-body .menus a{
+    display: block;
+    color: white;
+    padding: 16px 43px;
+}
+.pg-body .menus a:hover{
+    background-color: #2aabd2;
+}
+.menus{
+    width: 200px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top:48px;
+    background-color: #269abc;
+}
+.content{
+    position: absolute;
+    left: 200px;
+    right:0;
+    top:48px;
+    bottom:0;
+    min-width: 990px;
+    overflow:scroll;
+    z-index: 99;
+}

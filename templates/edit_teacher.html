@@ -1,26 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>编辑教师</title>
-</head>
-<body>
-    <h1>编辑教师</h1>
-    <form method="post" action="/edit_teacher/?nid={{ t_id }}">
-        教师名：
-        <input type="text" name="teacher_name" value="{{ t_name }}">
-        <p>
-            <select multiple="multiple" name="selete_class_id" style="height: 150px">
-                {% for row_class in class_list %}
-                    {% if row_class.id in old_class_list %}
-                        <option value="{{ row_class.id }}" selected>{{ row_class.class_name }}</option>
-                    {% else %}
-                        <option value="{{ row_class.id }}">{{ row_class.class_name }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        <input type="submit" content="修改">
-        </p>
-    </form>
-</body>
-</html>
+
+{% extends 'management.html' %}
+{% block include-css %}
+{% endblock include-css %}
+
+{% block content %}
+    <ol class="breadcrumb">
+      <li><a href="#">Home</a></li>
+      <li><a href="/teacher/">教师列表</a></li>
+      <li class="active">添加教师</li>
+    </ol>
+    <div style="padding-left: 50px;">
+        <form method="post" action="/edit_teacher/?nid={{ t_id }}">
+            教师名：
+            <input type="text" name="teacher_name" value="{{ t_name }}">
+            <p>
+                <select multiple="multiple" name="selete_class_id" style="height: 150px">
+                    {% for row_class in class_list %}
+                        {% if row_class.id in old_class_list %}
+                            <option value="{{ row_class.id }}" selected>{{ row_class.class_name }}</option>
+                        {% else %}
+                            <option value="{{ row_class.id }}">{{ row_class.class_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            <input type="submit" content="修改">
+            </p>
+        </form>
+    </div>
+
+{% endblock content %}
+
+{% block include-js %}
+{% endblock include-js %}
+

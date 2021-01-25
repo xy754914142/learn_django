@@ -6,26 +6,48 @@ def login(request):
     if request.method == 'GET':
         return render(request,'login.html')
     else:
-        ret = {'status':True,'message':None}
+        user = request.POST.get('username')
+        pwd = request.POST.get('password')
+        print(user)
+        print(pwd)
+        # if user=='root' and pwd=='123':
+        #     print('ok')
+        #     obj = redirect('/classes/')
+        #     obj.set_cookie('tiket','asdfghjk')
+        #     print('1')
+        #     return obj
+        # else:
+        #     print('2')
+        #     return render(request,'login.html')
+
+
         obj = Mysql_Connet()
-        try:
-            username = request.POST.get('username')
-            password = request.POST.get('password')
+        find_password = obj.mysql_fetchone('select password from userdata where username=%s',[username])
 
 
-            find_password = obj.mysql_fetchone('select password from userdata where username=%s',[username])
+    if find_password:
+        if find_password['password'] == pwd:
+            print(find_password['password'])
+            cook = redirect('/management/')
+            cook.set_cookie('ticket', 'asdfghjkl')
+            print('1')
+            return cook
+        else:
+            print('2')
+            return render(request,'login.html')
+    else:
+        print('3')
+        return render(request, 'login.html')
 
-            if find_password['password'] != password:
-                raise Exception
-        except Exception as e:
-            ret['status'] = False
-            ret['message']='登录失败！'
 
-        obj.mysql_colse()
-        return HttpResponse(json.dumps(ret))
+
+
 
 
 def management(request):
+    tk = request.COOKIES.get('ticket')
+    if not tk:
+        return redirect('/login/')
     return render(request,'management.html')
 
 def classes(request):
@@ -33,7 +55,7 @@ def classes(request):
     obj = Mysql_Connet()
     class_list = obj.mysql_result('select id,class_name from class',[])
     obj.mysql_colse()
-    return render(request,'classes.html',{"classes_list":class_list})
+    return render(request, 'classes.html', {"classes_list":class_list})
 
 
 

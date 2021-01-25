@@ -1,14 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>添加班级</title>
-</head>
-<body>
-    <h1>添加班级</h1>
-    <form method="post" action="/add_class/">
+
+{% extends 'management.html' %}
+{% block include-css %}
+{% endblock include-css %}
+
+{% block content %}
+    <ol class="breadcrumb">
+      <li><a href="#">Home</a></li>
+      <li><a href="/classes/">班级列表</a></li>
+      <li class="active">添加班级</li>
+    </ol>
+    <div style="padding-left: 50px;">
+        <form method="post" action="/add_class/">
         <input type="text" name="class_id">
         <input type="submit">
-    </form>
-</body>
-</html>
+        </form>
+    </div>
+
+{% endblock content %}
+
+{% block include-js %}
+{% endblock include-js %}
