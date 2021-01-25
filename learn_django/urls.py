@@ -55,5 +55,7 @@ urlpatterns = [
     path('get_class_list/', view.get_class_list),
     path('get_teacher2class_list/', view.get_teacher2class_list),
 
+
+
     path('admin/', admin.site.urls),
 ]
