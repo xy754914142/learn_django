@@ -1,6 +1,20 @@
 from django.shortcuts import render,redirect,HttpResponse
 from utils.connte_mysql import *
+from functools import wraps
 import json
+
+def check_login(func):
+    @wraps(func)
+    def inner(request,*args,**kwargs):
+        ret = request.get_signed_cookie('liu',default='0',salt='abc')
+        if ret == 'fenglin':
+            return func(request,*args,**kwargs)
+        else:
+            return redirect('/login/')
+
+    return inner
+
+
 
 def login(request):
     if request.method == 'GET':
@@ -8,27 +22,15 @@ def login(request):
     else:
         user = request.POST.get('username')
         pwd = request.POST.get('password')
-        # if user=='root' and pwd=='123':
-        #     print('ok')
-        #     obj = redirect('/classes/')
-        #     obj.set_cookie('tiket','asdfghjk')
-        #     print('1')
-        #     return obj
-        # else:
-        #     print('2')
-        #     return render(request,'login.html')
-
-
         obj = Mysql_Connet()
         find_password = obj.mysql_fetchone('select password from userdata where username=%s',[user])
-
 
     if find_password == None:
         return render(request, 'login.html')
 
     if find_password['password'] == pwd:
         cook = redirect('/management/')
-        cook.set_cookie('ticket', 'asdfghjkl',max_age=3600)
+        cook.set_signed_cookie('liu','fenglin',salt='abc',max_age=10)
         return cook
     else:
         return render(request,'login.html')
@@ -39,17 +41,12 @@ def login(request):
 
 
 
-
+@check_login
 def management(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     return render(request,'management.html')
 
+@check_login
 def classes(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     # class_list = mysql_result('select id,class_name from class')
     obj = Mysql_Connet()
     class_list = obj.mysql_result('select id,class_name from class',[])
@@ -57,11 +54,8 @@ def classes(request):
     return render(request, 'classes.html', {"classes_list":class_list})
 
 
-
+@check_login
 def add_class(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     if request.method == "GET":
         return render(request,'add_class.html')
     else:
@@ -69,19 +63,15 @@ def add_class(request):
         mysql_commit('insert into class(class_name) values(%s)', v)
         return redirect('/classes/')
 
+@check_login
 def del_class(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     nid = request.GET.get('nid')
     mysql_commit('delete from class where id = %s', nid)
 
     return redirect('/classes/')
 
+@check_login
 def edit_class(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     if request.method == 'GET':
         nid = request.GET.get('postid')
         class_list = mysql_fetchone('select id,class_name from class where id = %s',[nid,])
@@ -92,21 +82,16 @@ def edit_class(request):
         mysql_commit("update class set class_name = %s where id = %s",[class_name,nid,])
         return redirect('/classes/')
 
-
+@check_login
 def student(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     obj = Mysql_Connet()
     student_list = obj.mysql_result('select student.id,student.stu_name,class.class_name,class.id as clsid from student left join class on student.class_id = class.id',[])
     class_list = obj.mysql_result('select id,class_name from class',[])
     obj.mysql_colse()
     return render(request,'student.html',{'student_list':student_list,'class_list':class_list})
 
+@check_login
 def add_student(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     if request.method == "GET":
         class_list = mysql_result('select id,class_name from class')
         return render(request,'add_student.html',{'class_list':class_list})
@@ -116,18 +101,14 @@ def add_student(request):
         mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[name,class_id,])
         return redirect('/student/')
 
+@check_login
 def del_student(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     nid = request.GET.get('nid')
     mysql_commit('delete from student where id=%s',[nid,])
     return redirect('/student/')
 
+@check_login
 def edit_student(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     if request.method == "GET":
         nid = request.GET.get('nid')
         student_data = mysql_fetchone('select student.id,student.stu_name,class.class_name from student left join class on student.class_id = class.id where student.id = %s',[nid,])
@@ -140,11 +121,8 @@ def edit_student(request):
         mysql_commit('update student set stu_name=%s,class_id=%s where id=%s',[stu_name,class_id,nid,])
         return redirect('/student/')
 
-
+@check_login
 def modal_add_class(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status':True,'message':None}
     message_erro="处理erro"
     try:
@@ -160,10 +138,8 @@ def modal_add_class(request):
 
     return HttpResponse(json.dumps(ret))
 
+@check_login
 def modal_edit_class(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status':True, 'message':None}
     message_erro = "处理erro"
     try:
@@ -180,11 +156,8 @@ def modal_edit_class(request):
 
     return HttpResponse(json.dumps(ret))
 
-
+@check_login
 def modal_del_class(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status':True,'message':None}
     message_erro = "处理erro"
     try:
@@ -198,11 +171,8 @@ def modal_del_class(request):
 
 
 
-
+@check_login
 def modal_add_student(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {"status":True,'message':None}
     message_erro = "处理erro"
     try:
@@ -222,10 +192,8 @@ def modal_add_student(request):
     ret['message'] = message_erro
     return HttpResponse(json.dumps(ret))
 
+@check_login
 def modal_edit_student(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status':True,'message':None}
     message_erro = "处理erro"
     try:
@@ -247,10 +215,8 @@ def modal_edit_student(request):
     ret['message'] = message_erro
     return HttpResponse(json.dumps(ret))
 
+@check_login
 def modal_del_student(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status':True,'message':None}
     message_erro = '处理erro'
     try:
@@ -265,11 +231,8 @@ def modal_del_student(request):
     ret['message']=message_erro
     return HttpResponse(json.dumps(ret))
 
-
+@check_login
 def teacher(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     obj = Mysql_Connet()
     teacher_list = obj.mysql_result('select teacher.id as t_id, teacher.th_name,class.class_name from teacher left join relationship on teacher.id=relationship.t_id left join class on relationship.c_id= class.id',[])
     teacher_lists = {}
@@ -286,11 +249,8 @@ def teacher(request):
     obj.mysql_colse()
     return render(request,'teacher.html',{'teacher_list':teacher_lists.values(),'class_list':class_list})
 
-
+@check_login
 def add_teacher(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     obj = Mysql_Connet()
     if request.method == "GET":
         class_list = obj.mysql_result('select id,class_name from class',[])
@@ -308,10 +268,8 @@ def add_teacher(request):
         obj.mysql_colse()
         return redirect('/teacher/')
 
+@check_login
 def edit_teacher(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     obj = Mysql_Connet()
     if request.method == "GET":
         class_list = obj.mysql_result('select id,class_name from class',[])
@@ -342,21 +300,16 @@ def edit_teacher(request):
         obj.mysql_colse()
         return redirect('/teacher/')
 
-
+@check_login
 def del_teacher(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     del_id = request.GET.get('nid')
     obj = Mysql_Connet()
     obj.mysql_commit('delete from teacher where id=%s',[del_id,])
     obj.mysql_commit('delete from relationship where t_id=%s',[del_id,])
     return redirect('/teacher/')
 
+@check_login
 def modal_add_teacher(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status':True,'message':None}
     obj = Mysql_Connet()
     try:
@@ -372,10 +325,8 @@ def modal_add_teacher(request):
     obj.mysql_colse()
     return HttpResponse(json.dumps(ret))
 
+@check_login
 def modal_edit_teacher(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status': True, 'message': None}
     obj = Mysql_Connet()
     try:
@@ -394,10 +345,8 @@ def modal_edit_teacher(request):
     obj.mysql_colse()
     return HttpResponse(json.dumps(ret))
 
+@check_login
 def modal_del_teacher(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     ret = {'status': True, 'message': None}
     obj = Mysql_Connet()
     try:
@@ -412,20 +361,15 @@ def modal_del_teacher(request):
     obj.mysql_colse()
     return HttpResponse(json.dumps(ret))
 
-
+@check_login
 def get_class_list(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     obj = Mysql_Connet()
     class_list = obj.mysql_result('select id,class_name from class',[])
     obj.mysql_colse()
     return HttpResponse(json.dumps(class_list))
 
+@check_login
 def get_teacher2class_list(request):
-    tk = request.COOKIES.get('ticket')
-    if not tk:
-        return redirect('/login/')
     nid = request.POST.get('nid')
     obj = Mysql_Connet()
     class_list = obj.mysql_result('select c_id from relationship where t_id=%s',[nid])
@@ -435,3 +379,8 @@ def get_teacher2class_list(request):
         a.append(i['c_id'])
     return HttpResponse(json.dumps(a))
 
+@check_login
+def logout(request):
+    rep = redirect('/login/')
+    rep.delete_cookie('liu')
+    return rep
