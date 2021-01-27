@@ -5,8 +5,8 @@
 
 {% block content %}
     <ol class="breadcrumb">
-      <li><a href="#">Home</a></li>
-      <li><a href="/classes/">班级列表</a></li>
+      <li><a href="{% url 'mian_html' %}">Home</a></li>
+      <li><a href="{% url 'classes' %}">班级列表</a></li>
       <li class="active">编辑班级</li>
     </ol>
     <div style="padding-left: 50px;">

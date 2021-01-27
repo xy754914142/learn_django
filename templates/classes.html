@@ -7,12 +7,12 @@
 
 {% block content %}
         <ol class="breadcrumb">
-          <li><a href="/management/">Home</a></li>
+          <li><a href="{% url 'mian_html' %}">Home</a></li>
           <li class="active">班级列表</li>
         </ol>
     <div style="padding: 0 10px 10px 10px">
         <p>
-            <a href="/add_class/" class="btn btn-info">添加</a>
+            <a href="{% url 'add_class' %}" class="btn btn-info">添加</a>
             <a id="show_add" class="btn btn-primary">对话框添加</a>
         </p>
     </div>
@@ -29,7 +29,7 @@
         <tr>
         <td>{{ row.id }}</td>
         <td>{{ row.class_name }}</td>
-        <td><a href="/edit_class/?postid={{ row.id  }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+        <td><a href="｛% url 'edit_class' row.id %｝"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
              |
         <a class="show_edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 对话框</a>
             |

@@ -1,5 +1,4 @@
 $(function () {
-    Bindsign_btn();
     Bindinput();
 
 })
@@ -41,21 +40,4 @@ function Bindinput() {
     })
 }
 
-function Bindsign_btn() {
-    $('#sign_btn').click(function () {
-        $('.shadow .loading').removeClass('hide');
-        $.ajax({
-            url:'/login/',
-            type:'POST',
-            dataType:'JSON',
-            data:{'username':$('#username').val(),'password':$('#password').val()},
-            success:function (arg) {
-                if(arg.status){
-                    location.href ='/management/';
-                }else{
-                    $('#message').text(arg.message);
-                }
-            }
-        })
-    });
-}
+
