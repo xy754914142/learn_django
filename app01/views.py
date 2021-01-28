@@ -82,21 +82,24 @@ class Edit_class(View):
 @check_login
 def student(request):
     student_list = models.Student.objects.all()
-    class_list = models.Classes.objects.all()
+    class_list = []
+    # obj = Mysql_Connet()
+    # student_list = obj.mysql_result('select student.id,student.stu_name,class.class_name,class.id as clsid from student left join class on student.class_id = class.id',[])
+    # class_list = obj.mysql_result('select id,class_name from class',[])
+    # obj.mysql_colse()
     return render(request,'student.html',{'student_list':student_list,'class_list':class_list})
 
 
 @method_decorator(check_login, name='dispatch')
 class Add_student(View):
     def get(self,request):
-        class_list = models.Classes.objects.all()
+        class_list = mysql_result('select id,class_name from class')
         return render(request, 'add_student.html', {'class_list': class_list})
 
     def post(self,request):
         name = request.POST.get('name')
         class_id = request.POST.get('class_id')
-        #c_id = models.Classes.objects.get(id=class_id)
-        models.Student(stu_name=name,class_id=class_id).save()
+        mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[name,class_id,])
         return redirect(reverse('student'))
 
 
@@ -178,10 +181,10 @@ def modal_add_student(request):
         stu_name = request.POST.get('stu_name')
         class_id = request.POST.get('class_id')
         if len(stu_name)>0:
-            # obj = Mysql_Connet()
-            # obj.mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[stu_name,class_id,])
-            # obj.mysql_colse()
-            models.Student(stu_name=stu_name,class_id=class_id).save()
+            obj = Mysql_Connet()
+            obj.mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[stu_name,class_id,])
+            obj.mysql_colse()
+
         else:
             message_erro = "学生姓名不能为空"
             raise Exception()
