@@ -9,7 +9,7 @@
           <li class="active">学生列表</li>
     </ol>
     <div style="padding: 0 10px 10px 10px">
-    <p><a href="/add_student/" class="btn btn-info">添加</a>
+    <p><a href="{% url 'add_student' %}" class="btn btn-info">添加</a>
         <a id="add_modal" class="btn btn-primary">对话框添加</a></p>
     </div>
     <table  class="table table-bordered table-hover">
@@ -27,11 +27,11 @@
                     <td> {{ student.id }} </td>
                     <td> {{ student.stu_name }} </td>
                     <td clsid="{{ student.clsid }}"> {{ student.class_name }} </td>
-                    <td> <a href="/edit_student/?nid={{ student.id }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                    <td> <a href="{% url 'edit_student' student.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                         |
                         <a class="show_editWindow"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 对话框</a>
                          |
-                        <a href="/del_student/?nid={{ student.id }}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                        <a href="{% url 'del_student' student.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
                          |
                         <a class="del_maodal_show"><i class="fa fa-trash" aria-hidden="true"></i> 对话框</a>
                     </td>

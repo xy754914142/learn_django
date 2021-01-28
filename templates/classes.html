@@ -29,11 +29,11 @@
         <tr>
         <td>{{ row.id }}</td>
         <td>{{ row.class_name }}</td>
-        <td><a href="｛% url 'edit_class' row.id %｝"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+        <td><a href="{% url 'edit_class' row.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
              |
         <a class="show_edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 对话框</a>
             |
-        <a href="/del_class/?nid={{ row.id }}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+        <a href="{% url 'del_class' row.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
              |
         <a class="show_del"><i class="fa fa-trash" aria-hidden="true"></i> 对话框</a></td>
         </tr>

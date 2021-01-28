@@ -4,6 +4,7 @@ from app01 import models
 from utils.connte_mysql import *
 from functools import wraps
 import json
+from django.utils.decorators import method_decorator
 
 def check_login(func):
     @wraps(func)
@@ -32,7 +33,7 @@ class Login(View):
         print(userinfo.username, userinfo.password)
         if userinfo.password == pwd:
             cook = redirect(reverse('mian_html'))
-            cook.set_signed_cookie('liu', 'fenglin', salt='abc', max_age=1000)
+            cook.set_signed_cookie('liu', 'fenglin', salt='abc', max_age=10000)
             return cook
         else:
             return redirect(reverse('login'))
@@ -45,78 +46,78 @@ def management(request):
 @check_login
 def classes(request):
     # class_list = mysql_result('select id,class_name from class')
-    obj = Mysql_Connet()
-    class_list = obj.mysql_result('select id,class_name from class',[])
-    obj.mysql_colse()
+
+    class_list = models.Classes.objects.all()
+
     return render(request, 'classes.html', {"classes_list":class_list})
 
 
-@check_login
-def add_class(request):
-    if request.method == "GET":
+@method_decorator(check_login,name='dispatch')
+class Add_class(View):
+    def get(self,request):
         return render(request,'add_class.html')
-    else:
-        v = request.POST.get('class_id')
-        mysql_commit('insert into class(class_name) values(%s)', v)
-        return redirect('/classes/')
+
+    def post(self,request):
+        c_name = request.POST.get('class_name')
+        add_c = models.Classes(class_name=c_name)
+        add_c.save()
+        return redirect(reverse('classes'))
 
 @check_login
-def del_class(request):
-    nid = request.GET.get('nid')
-    mysql_commit('delete from class where id = %s', nid)
+def del_class(request,nid):
+    models.Classes.objects.get(id=nid).delete()
+    return redirect(reverse('classes'))
 
-    return redirect('/classes/')
-
-@check_login
-def edit_class(request):
-    if request.method == 'GET':
-        nid = request.GET.get('postid')
-        class_list = mysql_fetchone('select id,class_name from class where id = %s',[nid,])
+@method_decorator(check_login,name='dispatch')
+class Edit_class(View):
+    def get(self,request,nid):
+        class_list = models.Classes.objects.get(id=nid)
         return render(request,'edit_class.html',{'nid':nid,'class_list':class_list})
-    else:
-        nid = request.GET.get('nid')
+
+    def post(self,request,nid):
         class_name = request.POST.get('title')
-        mysql_commit("update class set class_name = %s where id = %s",[class_name,nid,])
-        return redirect('/classes/')
+        models.Classes.objects.filter(id=nid).update(class_name=class_name)
+        return redirect(reverse('classes'))
 
 @check_login
 def student(request):
-    obj = Mysql_Connet()
-    student_list = obj.mysql_result('select student.id,student.stu_name,class.class_name,class.id as clsid from student left join class on student.class_id = class.id',[])
-    class_list = obj.mysql_result('select id,class_name from class',[])
-    obj.mysql_colse()
+    student_list = models.Student.objects.all()
+    class_list = models.Classes.objects.all()
     return render(request,'student.html',{'student_list':student_list,'class_list':class_list})
 
-@check_login
-def add_student(request):
-    if request.method == "GET":
-        class_list = mysql_result('select id,class_name from class')
-        return render(request,'add_student.html',{'class_list':class_list})
-    else:
+
+@method_decorator(check_login, name='dispatch')
+class Add_student(View):
+    def get(self,request):
+        class_list = models.Classes.objects.all()
+        return render(request, 'add_student.html', {'class_list': class_list})
+
+    def post(self,request):
         name = request.POST.get('name')
         class_id = request.POST.get('class_id')
-        mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[name,class_id,])
-        return redirect('/student/')
+        #c_id = models.Classes.objects.get(id=class_id)
+        models.Student(stu_name=name,class_id=class_id).save()
+        return redirect(reverse('student'))
+
 
 @check_login
 def del_student(request):
     nid = request.GET.get('nid')
     mysql_commit('delete from student where id=%s',[nid,])
-    return redirect('/student/')
+    return redirect(reverse('student'))
 
-@check_login
-def edit_student(request):
-    if request.method == "GET":
-        nid = request.GET.get('nid')
+@method_decorator(check_login, name='dispatch')
+class Edit_student(View):
+    def get(self,request,nid):
         student_data = mysql_fetchone('select student.id,student.stu_name,class.class_name from student left join class on student.class_id = class.id where student.id = %s',[nid,])
         class_list = mysql_result('select * from class')
         return render(request,'edit_student.html',{'student_data':student_data,'class_list':class_list})
-    else:
-        nid = request.GET.get('nid')
+
+    def post(self,request,nid):
         stu_name = request.POST.get('name')
         class_id = request.POST.get('class_id')
         mysql_commit('update student set stu_name=%s,class_id=%s where id=%s',[stu_name,class_id,nid,])
-        return redirect('/student/')
+        return redirect(reverse('student'))
 
 @check_login
 def modal_add_class(request):
@@ -125,7 +126,8 @@ def modal_add_class(request):
     try:
         class_name = request.POST.get('class_name')
         if len(class_name)>0:
-            mysql_commit('insert into class(class_name) values(%s)', class_name)
+            add_c = models.Classes(class_name=class_name)
+            add_c.save()
         else:
             message_erro = "班级名不能为空"
             raise Exception()
@@ -143,7 +145,7 @@ def modal_edit_class(request):
         class_name = request.POST.get('class_name')
         nid = request.POST.get('nid')
         if len(class_name)>0:
-            mysql_commit('update class set class_name=%s where id=%s',[class_name,nid,])
+            models.Classes.objects.filter(id=nid).update(class_name=class_name)
         else:
             message_erro = "班级名不能为空"
             raise Exception()
@@ -176,10 +178,10 @@ def modal_add_student(request):
         stu_name = request.POST.get('stu_name')
         class_id = request.POST.get('class_id')
         if len(stu_name)>0:
-            obj = Mysql_Connet()
-            obj.mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[stu_name,class_id,])
-            obj.mysql_colse()
-
+            # obj = Mysql_Connet()
+            # obj.mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[stu_name,class_id,])
+            # obj.mysql_colse()
+            models.Student(stu_name=stu_name,class_id=class_id).save()
         else:
             message_erro = "学生姓名不能为空"
             raise Exception()
@@ -348,9 +350,10 @@ def modal_del_teacher(request):
     obj = Mysql_Connet()
     try:
         t_id = request.POST.get('nid')
-        obj.mysql_commit('delete from relationship where t_id=%s',[t_id])
-        obj.mysql_commit('delete from teacher where id=%s',[t_id])
-
+        # obj.mysql_commit('delete from relationship where t_id=%s',[t_id])
+        # obj.mysql_commit('delete from teacher where id=%s',[t_id])
+        models.Teacher2Class.objects.get(t_id=t_id).delete()
+        models.Teacher.objects.get(id=t_id).delete()
     except Exception as e:
         ret['status'] = False
         ret['message'] = '删除失败'

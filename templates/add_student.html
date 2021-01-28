@@ -6,11 +6,11 @@
 {% block content %}
     <ol class="breadcrumb">
       <li><a href="{% url 'mian_html' %}">Home</a></li>
-      <li><a href="/student/">学生列表</a></li>
+      <li><a href="{% url 'student' %}">学生列表</a></li>
       <li class="active">添加学生</li>
     </ol>
     <div style="padding-left: 50px;">
-        <form method="post" action="/add_student/">
+        <form method="post" action="{% url 'add_student' %}">
             姓名：<input type="text" name="name" />
                 <select name="class_id">
                     {% for class_i in class_list %}

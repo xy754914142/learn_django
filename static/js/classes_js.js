@@ -10,7 +10,7 @@ $(function () {
         })
         $('#add_submit').click(function () {
             $.ajax({
-                url:'/modal_add_class/',
+                url:reverse('modal_add_class'),
                 type:'POST',
                 data:{'class_name':$('#class_name').val()},
                 dataType:"JSON",
@@ -35,7 +35,7 @@ $(function () {
         })
         $('#change_submit').click(function () {
             $.ajax({
-                url:'/modal_edit_class/',
+                url:reverse('modal_edit_class'),
                 type:'POST',
                 dataType:'JSON',
                 data:{'nid':$('#nid').text(),'class_name':$('#edit_class_name').val()},
@@ -59,7 +59,7 @@ $(function () {
         })
         $('#del_btn').click(function () {
             $.ajax({
-                url:'/modal_del_class/',
+                url:reverse('modal_del_class'),
                 type:'POST',
                 dataType:'JSON',
                 data:{'nid':$('#del_id').text()},
