@@ -30,7 +30,6 @@ class Login(View):
 
         if userinfo == None:
             return redirect(reverse('login'))
-        print(userinfo.username, userinfo.password)
         if userinfo.password == pwd:
             cook = redirect(reverse('mian_html'))
             cook.set_signed_cookie('liu', 'fenglin', salt='abc', max_age=10000)
@@ -81,49 +80,6 @@ class Edit_class(View):
         models.Classes.objects.filter(id=nid).update(class_name=class_name)
         return redirect(reverse('classes',kwargs={'page':1}))
 
-@check_login
-def student(request,page):
-    page_info = PageInfo(page,models.Student.objects.all().count(),10,'/student/',11)
-
-
-    student_list = models.Student.objects.all()[page_info.start():page_info.end()]
-    class_list = models.Classes.objects.all()[page_info.start():page_info.end()]
-    print(models.Student.objects.all().count())
-    print(class_list)
-    return render(request,'student.html',{'student_list':student_list,'class_list':class_list,'page_info':page_info})
-
-
-@method_decorator(check_login, name='dispatch')
-class Add_student(View):
-    def get(self,request):
-        class_list = models.Classes.objects.all()
-        return render(request, 'add_student.html', {'class_list': class_list})
-
-    def post(self,request):
-        name = request.POST.get('name')
-        class_id = request.POST.get('class_id')
-        models.Student.objects.create(stu_name=name,classes_id=class_id)
-        return redirect(reverse('student',kwargs={'page':1}))
-
-
-@check_login
-def del_student(request):
-    nid = request.GET.get('nid')
-    mysql_commit('delete from student where id=%s',[nid,])
-    return redirect(reverse('student',kwargs={'page':1}))
-
-@method_decorator(check_login, name='dispatch')
-class Edit_student(View):
-    def get(self,request,nid):
-        student_data = mysql_fetchone('select student.id,student.stu_name,class.class_name from student left join class on student.class_id = class.id where student.id = %s',[nid,])
-        class_list = mysql_result('select * from class')
-        return render(request,'edit_student.html',{'student_data':student_data,'class_list':class_list})
-
-    def post(self,request,nid):
-        stu_name = request.POST.get('name')
-        class_id = request.POST.get('class_id')
-        mysql_commit('update student set stu_name=%s,class_id=%s where id=%s',[stu_name,class_id,nid,])
-        return redirect(reverse('student'))
 
 @check_login
 def modal_add_class(request):
@@ -167,12 +123,59 @@ def modal_del_class(request):
     message_erro = "处理erro"
     try:
         nid = request.POST.get('nid')
-        mysql_commit('delete from class where id=%s',[nid,])
+        models.Classes.objects.get(id=nid).delete()
     except Exception as e:
         ret['status'] = False
         ret['message'] = message_erro
 
     return HttpResponse(json.dumps(ret))
+
+
+
+
+
+
+
+
+@check_login
+def student(request,page):
+    page_info = PageInfo(page,models.Student.objects.all().count(),10,'/student/',11)
+    student_list = models.Student.objects.all()[page_info.start():page_info.end()]
+    class_list = models.Classes.objects.all()
+    return render(request,'student.html',{'student_list':student_list,'class_list':class_list,'page_info':page_info})
+
+
+@method_decorator(check_login, name='dispatch')
+class Add_student(View):
+    def get(self,request):
+        class_list = models.Classes.objects.all()
+        return render(request, 'add_student.html', {'class_list': class_list})
+
+    def post(self,request):
+        name = request.POST.get('name')
+        class_id = request.POST.get('class_id')
+        models.Student.objects.create(stu_name=name,classes_id=class_id)
+        return redirect(reverse('student',kwargs={'page':1}))
+
+
+@check_login
+def del_student(request,nid):
+    models.Student.objects.get(id=nid).delete()
+    return redirect(reverse('student',kwargs={'page':1}))
+
+@method_decorator(check_login, name='dispatch')
+class Edit_student(View):
+    def get(self,request,nid):
+        student_data = models.Student.objects.filter(id=nid).values('id','stu_name','classes__class_name')[0]
+        class_list = models.Classes.objects.all()
+        return render(request,'edit_student.html',{'student_data':student_data,'class_list':class_list})
+
+    def post(self,request,nid):
+        stu_name = request.POST.get('name')
+        class_id = request.POST.get('class_id')
+        models.Student.objects.filter(id=nid).update(stu_name=stu_name,classes_id=class_id)
+        return redirect(reverse('student',kwargs={'page':1}))
+
 
 
 
@@ -184,10 +187,7 @@ def modal_add_student(request):
         stu_name = request.POST.get('stu_name')
         class_id = request.POST.get('class_id')
         if len(stu_name)>0:
-            obj = Mysql_Connet()
-            obj.mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[stu_name,class_id,])
-            obj.mysql_colse()
-
+            models.Student.objects.create(stu_name=stu_name,classes_id=class_id)
         else:
             message_erro = "学生姓名不能为空"
             raise Exception()
@@ -207,10 +207,7 @@ def modal_edit_student(request):
         stu_name = request.POST.get('stu_name')
         class_id = request.POST.get('class_id')
         if len(stu_name)>0:
-            obj = Mysql_Connet()
-            obj.mysql_commit('update student set stu_name=%s,class_id=%s where id=%s ', [stu_name, class_id, stu_id,])
-            obj.mysql_colse()
-
+            models.Student.objects.filter(id=stu_id).update(stu_name=stu_name,classes_id=class_id)
         else:
             message_erro = "学生姓名不能为空"
             raise Exception()
@@ -226,9 +223,7 @@ def modal_del_student(request):
     message_erro = '处理erro'
     try:
         stu_id = request.POST.get('nid')
-        obj = Mysql_Connet()
-        obj.mysql_commit('delete from student where id=%s',[stu_id,])
-        obj.mysql_colse()
+        models.Student.objects.get(id=stu_id).delete()
     except Exception as e:
         message_erro = "删除失败请稍后再试！"
         ret['status'] = False
@@ -264,7 +259,6 @@ def add_teacher(request):
     else:
         t_name = request.POST.get('teacher_name')
         add_class_list = request.POST.getlist('selete_class_id')
-        print(add_class_list)
         t_id = obj.mysql_commit_return_id('insert into teacher(th_name) values(%s)',[t_name,])
         t_2_c = []
         for class_id in add_class_list:
@@ -393,6 +387,7 @@ def logout(request):
 
 def add_data(request):
     for i in range(1,200):
-        v = models.Student.objects.create(stu_name=('student'+str(i)),classes_id=(1))
-        print(v)
+        v = models.Student.objects.create(stu_name=('student'+str(i)),classes_id=(5))
+        # v = models.Classes.objects.create(class_name=('classes'+str(i)))
+
     return HttpResponse('ok')

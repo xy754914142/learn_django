@@ -26,7 +26,7 @@
                 <tr>
                     <td> {{ student.id }} </td>
                     <td> {{ student.stu_name }} </td>
-                    <td clsid="{{ student.clsid }}"> {{ student.classes.class_name }} </td>
+                    <td clsid="{{ student.classes_id }}"> {{ student.classes.class_name }} </td>
                     <td> <a href="{% url 'edit_student' student.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                         |
                         <a class="show_editWindow"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 对话框</a>
