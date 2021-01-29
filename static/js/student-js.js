@@ -31,6 +31,7 @@ $(function () {
             arg = $(this).parent().prevAll();
             stu_id = $(arg[2]).text()
             stu_name = $(arg[1]).text();
+            console.log(stu_id,stu_name);
             clsid = $(arg[0]).attr('clsid');
             $('#edit_stu_id').text(stu_id);
             $('#select_class').val(clsid);

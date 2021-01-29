@@ -6,13 +6,13 @@
 {% block content %}
     <ol class="breadcrumb">
       <li><a href="{% url 'mian_html' %}">Home</a></li>
-      <li><a href="{% url 'classes' %}">班级列表</a></li>
+      <li><a href="{% url 'classes' 1 %}">班级列表</a></li>
       <li class="active">添加班级</li>
     </ol>
     <div style="padding-left: 50px;">
         <form method="post" action="{% url 'add_class' %}">
-        <input type="text" name="class_name">
-        <input type="submit">
+            班级名称：<input type="text" name="class_name">
+            <input type="submit" value="添加">
         </form>
     </div>
 

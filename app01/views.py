@@ -1,11 +1,11 @@
 from django.shortcuts import render,redirect,HttpResponse,reverse
 from django.views import View
 from app01 import models
-from utils.connte_mysql import *
 from functools import wraps
 import json
 from django.utils.decorators import method_decorator
-
+from utils.pager import PageInfo
+from utils.connte_mysql import *
 def check_login(func):
     @wraps(func)
     def inner(request,*args,**kwargs):
@@ -44,12 +44,14 @@ def management(request):
     return render(request,'management.html')
 
 @check_login
-def classes(request):
+def classes(request,page):
     # class_list = mysql_result('select id,class_name from class')
+    # page = request.GET.get('page')
+    page_info = PageInfo(page, models.Classes.objects.all().count(),10,'/classes/',11)
 
-    class_list = models.Classes.objects.all()
+    class_list = models.Classes.objects.all()[page_info.start():page_info.end()]
 
-    return render(request, 'classes.html', {"classes_list":class_list})
+    return render(request, 'classes.html', {"classes_list":class_list,'page_info':page_info})
 
 
 @method_decorator(check_login,name='dispatch')
@@ -61,12 +63,12 @@ class Add_class(View):
         c_name = request.POST.get('class_name')
         add_c = models.Classes(class_name=c_name)
         add_c.save()
-        return redirect(reverse('classes'))
+        return redirect(reverse('classes',kwargs={'page':1}))
 
 @check_login
 def del_class(request,nid):
     models.Classes.objects.get(id=nid).delete()
-    return redirect(reverse('classes'))
+    return redirect(reverse('classes',kwargs={'page':1}))
 
 @method_decorator(check_login,name='dispatch')
 class Edit_class(View):
@@ -77,37 +79,38 @@ class Edit_class(View):
     def post(self,request,nid):
         class_name = request.POST.get('title')
         models.Classes.objects.filter(id=nid).update(class_name=class_name)
-        return redirect(reverse('classes'))
+        return redirect(reverse('classes',kwargs={'page':1}))
 
 @check_login
-def student(request):
-    student_list = models.Student.objects.all()
-    class_list = []
-    # obj = Mysql_Connet()
-    # student_list = obj.mysql_result('select student.id,student.stu_name,class.class_name,class.id as clsid from student left join class on student.class_id = class.id',[])
-    # class_list = obj.mysql_result('select id,class_name from class',[])
-    # obj.mysql_colse()
-    return render(request,'student.html',{'student_list':student_list,'class_list':class_list})
+def student(request,page):
+    page_info = PageInfo(page,models.Student.objects.all().count(),10,'/student/',11)
+
+
+    student_list = models.Student.objects.all()[page_info.start():page_info.end()]
+    class_list = models.Classes.objects.all()[page_info.start():page_info.end()]
+    print(models.Student.objects.all().count())
+    print(class_list)
+    return render(request,'student.html',{'student_list':student_list,'class_list':class_list,'page_info':page_info})
 
 
 @method_decorator(check_login, name='dispatch')
 class Add_student(View):
     def get(self,request):
-        class_list = mysql_result('select id,class_name from class')
+        class_list = models.Classes.objects.all()
         return render(request, 'add_student.html', {'class_list': class_list})
 
     def post(self,request):
         name = request.POST.get('name')
         class_id = request.POST.get('class_id')
-        mysql_commit('insert into student(stu_name,class_id) values(%s,%s)',[name,class_id,])
-        return redirect(reverse('student'))
+        models.Student.objects.create(stu_name=name,classes_id=class_id)
+        return redirect(reverse('student',kwargs={'page':1}))
 
 
 @check_login
 def del_student(request):
     nid = request.GET.get('nid')
     mysql_commit('delete from student where id=%s',[nid,])
-    return redirect(reverse('student'))
+    return redirect(reverse('student',kwargs={'page':1}))
 
 @method_decorator(check_login, name='dispatch')
 class Edit_student(View):
@@ -387,3 +390,9 @@ def logout(request):
     rep = redirect('/login/')
     rep.delete_cookie('liu')
     return rep
+
+def add_data(request):
+    for i in range(1,200):
+        v = models.Student.objects.create(stu_name=('student'+str(i)),classes_id=(1))
+        print(v)
+    return HttpResponse('ok')

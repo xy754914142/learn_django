@@ -28,7 +28,7 @@ urlpatterns = [
     path('login.html', views.Login.as_view(), name='login'),
     path('management.html', views.management,name='mian_html'),
 
-    path('classes.html',views.classes,name='classes'),
+    path('classes/<int:page>.html',views.classes,name='classes'),
     path('add_class.html',views.Add_class.as_view(),name='add_class'),
     path('del_class/<int:nid>.html', views.del_class, name='del_class'),
     path('edit_class/<int:nid>.html', views.Edit_class.as_view(), name='edit_class'),
@@ -37,7 +37,7 @@ urlpatterns = [
     path('modal_del_class/', views.modal_del_class, name='modal_del_class'),
 
 
-    path('student.html', views.student, name='student'),
+    path('student/<int:page>.html', views.student, name='student'),
     path('add_student.html', views.Add_student.as_view(), name='add_student'),
     path('del_student/<int:nid>.html', views.del_student, name='del_student'),
     path('edit_student/<int:nid>.html', views.Edit_student.as_view(), name='edit_student'),
@@ -59,5 +59,7 @@ urlpatterns = [
     path('get_teacher2class_list/', views.get_teacher2class_list),
 
     path('logout/', views.logout),
+
+    path('add_data/',views.add_data)
 
 ]
