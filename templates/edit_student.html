@@ -10,7 +10,7 @@
       <li class="active">编辑学生</li>
     </ol>
     <div style="padding-left: 50px;">
-       <form method="post" action="/edit_student/?nid={{ student_data.id }}">
+       <form method="post" action="{% url 'edit_student' student_data.id %}">
             姓名：<input type="text" name="name"  value={{ student_data.stu_name }} >
                 <select name="class_id" >
                     {% for class_i in class_list %}

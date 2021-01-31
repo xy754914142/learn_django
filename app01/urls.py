@@ -46,8 +46,8 @@ urlpatterns = [
     path('modal_del_student/', views.modal_del_student, name='modal_del_student'),
 
 
-    path('teacher/', views.teacher, name='teacher'),
-    path('add_teacher/', views.add_teacher, name='add_teacher'),
+    path('teacher/<int:page>.html', views.teacher, name='teacher'),
+    path('add_teacher.html', views.add_teacher, name='add_teacher'),
     path('edit_teacher/<int:nid>.html', views.edit_teacher, name='edit_teacher'),
     path('del_teacher/<int:nid>.html', views.del_teacher, name='del_teacher'),
     path('modal_add_teacher/', views.modal_add_teacher, name='modal_add_teacher'),
@@ -55,8 +55,8 @@ urlpatterns = [
     path('modal_del_teacher/', views.modal_del_teacher, name='modal_del_teacher'),
 
 
-    path('get_class_list/', views.get_class_list),
-    path('get_teacher2class_list/', views.get_teacher2class_list),
+    path('get_class_list/', views.get_class_list,name='get_class_list'),
+    path('get_teacher2class_list/', views.get_teacher2class_list,name='get_teacher2class_list'),
 
     path('logout/', views.logout),
 

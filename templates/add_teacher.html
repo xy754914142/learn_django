@@ -6,21 +6,21 @@
 {% block content %}
     <ol class="breadcrumb">
       <li><a href="{% url 'mian_html' %}">Home</a></li>
-      <li><a href="/teacher/">教师列表</a></li>
+      <li><a href="{% url 'teacher' 1 %}">教师列表</a></li>
       <li class="active">添加教师</li>
     </ol>
     <div style="padding-left: 50px;">
-    <form method="post" action="/add_teacher/">
+    <form method="post" action="{% url 'add_teacher' %}">
         教师名：
         <input type="text" name="teacher_name">
-        <p>
+
             <select multiple="multiple" name="selete_class_id" style="height: 150px">
                 {% for row_class in class_list %}
                 <option value="{{ row_class.id }}">{{ row_class.class_name }}</option>
                 {% endfor %}
             </select>
         <input type="submit" content="提交">
-        </p>
+
     </form>
     </div>
 

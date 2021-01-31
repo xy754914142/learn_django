@@ -6,13 +6,13 @@
 {% block content %}
     <ol class="breadcrumb">
       <li><a href="{% url 'mian_html' %}">Home</a></li>
-      <li><a href="/teacher/">教师列表</a></li>
+      <li><a href="{% url 'teacher' 1 %}">教师列表</a></li>
       <li class="active">添加教师</li>
     </ol>
     <div style="padding-left: 50px;">
-        <form method="post" action="/edit_teacher/?nid={{ t_id }}">
+        <form method="post" action="{% url 'edit_teacher' t_id %}">
             教师名：
-            <input type="text" name="teacher_name" value="{{ t_name }}">
+            <input type="text" name="teacher_name" value="{{ e_teacher.th_name }}">
             <p>
                 <select multiple="multiple" name="selete_class_id" style="height: 150px">
                     {% for row_class in class_list %}

@@ -31,7 +31,7 @@
     <div class="menus">
         <a href="{% url 'student' 1 %}"><i class="fa fa-child" aria-hidden="true"></i> 学生列表</a>
         <a href="{% url 'classes' 1 %}"><i class="fa fa-book" aria-hidden="true"></i> 班级列表</a>
-        <a href={% url 'teacher' %}i class="fa fa-male" aria-hidden="true"></i> 教师列表</a>
+        <a href="{% url 'teacher' 1 %}"><i class="fa fa-male" aria-hidden="true"></i> 教师列表</a>
     </div>
     <div class="content">
         {% block content %}

@@ -11,7 +11,7 @@ $(function () {
 
         $('#add_btn').click(function () {
             $.ajax({
-                url:reverse('modal_add_student'),
+                url:'/modal_add_student/',
                 type:'POST',
                 dataType:'JSON',
                 data:{'stu_name':$('#add_student_name').val(),'class_id':$('#add_class_name').val()},
@@ -29,10 +29,10 @@ $(function () {
             $('#shadow_window').removeClass('hide');
             $('#modal_window_edit').removeClass('hide');
             arg = $(this).parent().prevAll();
-            stu_id = $(arg[2]).text()
+            stu_id = $(arg[2]).text();
             stu_name = $(arg[1]).text();
-            console.log(stu_id,stu_name);
             clsid = $(arg[0]).attr('clsid');
+            console.log(stu_id,stu_name,clsid);
             $('#edit_stu_id').text(stu_id);
             $('#select_class').val(clsid);
             $('#edit_stu_name').val(stu_name);
@@ -40,7 +40,7 @@ $(function () {
 
         $('#edit_btn').click(function () {
             $.ajax({
-                url:reverse('modal_edit_student'),
+                url:'/modal_edit_student/',
                 type:'POST',
                 dataType:'JSON',
                 data:{'stu_id':$('#edit_stu_id').text(),'stu_name':$('#edit_stu_name').val(),'class_id':$('#select_class').val()},
@@ -68,7 +68,7 @@ $(function () {
 
         $('#del_button').click(function(){
             $.ajax({
-                url:reverse('modal_del_student'),
+                url:'/modal_del_student/',
                 type:'POST',
                 dataType:'JSON',
                 data:{'nid':$('#del_stu_id').text()},
