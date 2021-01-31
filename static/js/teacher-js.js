@@ -139,7 +139,6 @@ function Binddel_btn() {
                     $('#err_del').text(arg.message);
                 }
             }
-
         })
     })
 }
