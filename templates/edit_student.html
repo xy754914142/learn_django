@@ -6,7 +6,7 @@
 {% block content %}
     <ol class="breadcrumb">
       <li><a href="{% url 'mian_html' %}">Home</a></li>
-      <li><a href="/student/">学生列表</a></li>
+      <li><a href='{% url 'student' 1 %}'>学生列表</a></li>
       <li class="active">编辑学生</li>
     </ol>
     <div style="padding-left: 50px;">
@@ -14,7 +14,7 @@
             姓名：<input type="text" name="name"  value={{ student_data.stu_name }} >
                 <select name="class_id" >
                     {% for class_i in class_list %}
-                        {% if class_i.class_name == student_data.class_name %}
+                        {% if class_i.class_name == student_data.classes__class_name %}
                             <option selected="selected" value={{ class_i.id }} >{{ class_i.class_name }}</option>
                         {% else %}
                             <option value={{ class_i.id }}>{{ class_i.class_name }}</option>
