@@ -14,18 +14,19 @@ function BindCancel() {
         $('.shadow,.mymodal').addClass('hide');
     })
 }
+
 function Bindshow_add_modal() {
     $('#show_add_modal').click(function () {
         $('.shadow,.loading').removeClass('hide');
         $.ajax({
-            url:'/get_class_list/',
-            type:'GET',
-            dataType:'JSON',
-            success:function (arg) {
-                $.each(arg,function (i,row) {
+            url: '/get_class_list/',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function (arg) {
+                $.each(arg, function (i, row) {
                     var tag = document.createElement('option');
                     tag.innerHTML = row.class_name;
-                    tag.setAttribute('value',row.id);
+                    tag.setAttribute('value', row.id);
                     $('#add_select').append(tag);
                 })
                 $('.loading').addClass('hide');
@@ -34,24 +35,26 @@ function Bindshow_add_modal() {
         })
     })
 }
+
 function Bindadd_btu() {
     $('#add_btu').click(function () {
         $.ajax({
-            url:'/modal_add_teacher/',
-            type:'POST',
-            dataType:'JSON',
-            data:{'t_name':$('#add_t_name').val(),'class_id_list':$('#add_select').val()},
-            traditional:true,
-            success:function (arg) {
-                if(arg.status){
+            url: '/modal_add_teacher/',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {'t_name': $('#add_t_name').val(), 'class_id_list': $('#add_select').val()},
+            traditional: true,
+            success: function (arg) {
+                if (arg.status) {
                     location.reload();
-                }else{
+                } else {
                     $('#add_err').text(arg.message);
                 }
             }
         })
     })
 }
+
 function Bindshow_edit_modal() {
     $('.show_edit_modal').click(function () {
         $('.shadow,.loading').removeClass('hide')
@@ -67,49 +70,53 @@ function Bindshow_edit_modal() {
             dataType: 'JSON',
             data: {'nid': nid},
             success: function (arg) {
-                 $.ajax({
-                        url:'/get_class_list/',
-                        type:'GET',
-                        dataType:'JSON',
-                        success:function (value) {
-                            $.each(value,function (i,row) {
-                                var tag = document.createElement('option');
-                                tag.innerHTML = row.class_name;
-                                tag.setAttribute('value',row.id);
-                                if(arg.indexOf(row.id) != -1){
-                                    tag.setAttribute('selected','selected');
-                                }
-                                $('#edit_select').append(tag);
-                            })
-                            $('.loading').addClass('hide');
-                            $('#edit_modal').removeClass('hide');
-                        }
-                    });
+                $.ajax({
+                    url: '/get_class_list/',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function (value) {
+                        $.each(value, function (i, row) {
+                            var tag = document.createElement('option');
+                            tag.innerHTML = row.class_name;
+                            tag.setAttribute('value', row.id);
+                            if (arg.indexOf(row.id) != -1) {
+                                tag.setAttribute('selected', 'selected');
+                            }
+                            $('#edit_select').append(tag);
+                        })
+                        $('.loading').addClass('hide');
+                        $('#edit_modal').removeClass('hide');
+                    }
+                });
             }
         })
-
-
     })
 
 }
+
 function Bindedit_btu() {
     $('#edit_btu').click(function () {
         $.ajax({
-            url:'/modal_edit_teacher/',
-            type:'POST',
-            dataType:'JSON',
-            data:{'nid':$('#edit_id').text(),'t_name':$('#edit_t_name').val(),'class_list':$('#edit_select').val()},
-            traditional:true,
-            success:function (arg) {
-                if(arg.status){
+            url: '/modal_edit_teacher/',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                'nid': $('#edit_id').text(),
+                't_name': $('#edit_t_name').val(),
+                'class_list': $('#edit_select').val()
+            },
+            traditional: true,
+            success: function (arg) {
+                if (arg.status) {
                     location.reload();
-                }else{
+                } else {
                     $('#edit_err').text(arg.message);
                 }
             }
         })
     })
 }
+
 function Bindshow_del_modal() {
     $('.show_del_modal').click(function () {
         $(".shadow,.loading").removeClass('hide');
@@ -125,17 +132,18 @@ function Bindshow_del_modal() {
     })
 
 }
+
 function Binddel_btn() {
     $('#del_btn').click(function () {
         $.ajax({
-            url:'/modal_del_teacher/',
-            type:'POST',
-            dataType:'JSON',
-            data:{'nid':$('#del_id').text()},
-            success:function (arg) {
-                if(arg.status){
+            url: '/modal_del_teacher/',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {'nid': $('#del_id').text()},
+            success: function (arg) {
+                if (arg.status) {
                     location.reload();
-                }else{
+                } else {
                     $('#err_del').text(arg.message);
                 }
             }

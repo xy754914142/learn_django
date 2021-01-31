@@ -6,8 +6,8 @@
 
 {% block content %}
     <ol class="breadcrumb">
-          <li><a href="{% url 'mian_html' %}">Home</a></li>
-          <li class="active">教师列表</li>
+        <li><a href="{% url 'mian_html' %}">Home</a></li>
+        <li class="active">教师列表</li>
     </ol>
     <div style="padding: 0 10px 10px 10px">
         <p>
@@ -25,22 +25,22 @@
         </tr>
         </thead>
         <tbody>
-            {% for rows in teacher_list %}
-                <tr>
-                    <td>{{ rows.id }}</td>
-                    <td>{{ rows.th_name }}</td>
-                    <td>{% for class_name in rows.classes_names %}
-                        <span style="border:1px solid red;display: inline-block;padding: 5px">{{ class_name }}</span>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        <a href="{% url 'edit_teacher' rows.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>|
-                        <a class="show_edit_modal"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 编辑框</a>|
-                        <a href="{% url 'del_teacher' rows.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>|
-                        <a class="show_del_modal"><i class="fa fa-trash" aria-hidden="true"></i> 编辑框</a>
-                    </td>
-                </tr>
-            {% endfor %}
+        {% for rows in teacher_list %}
+            <tr>
+                <td>{{ rows.id }}</td>
+                <td>{{ rows.th_name }}</td>
+                <td>{% for class_name in rows.classes_names %}
+                    <span style="border:1px solid red;display: inline-block;padding: 5px">{{ class_name }}</span>
+                {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'edit_teacher' rows.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>|
+                    <a class="show_edit_modal"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 编辑框</a>|
+                    <a href="{% url 'del_teacher' rows.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>|
+                    <a class="show_del_modal"><i class="fa fa-trash" aria-hidden="true"></i> 编辑框</a>
+                </td>
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 
@@ -77,18 +77,18 @@
 
     <div class="mymodal hide" id="del_modal">
         <div style="margin:20px">
-            是否删除编号：<span id="del_id"></span>   教师名称:<span id="del_name"></span>
+            是否删除编号：<span id="del_id"></span> 教师名称:<span id="del_name"></span>
             <p>任课班级:<span id="del_t_class"></span></p>
             <input type="button" id="del_btn" value="删除"/>
-            <input type="button" class="cancel"  value="取消"/>
+            <input type="button" class="cancel" value="取消"/>
             <p id="err_del"></p>
         </div>
     </div>
 
     <nav aria-label="Page navigation">
-      <ul class="pagination">
-          {{ page_info.page|safe }}
-      </ul>
+        <ul class="pagination">
+            {{ page_info.page|safe }}
+        </ul>
     </nav>
 {% endblock content %}
 

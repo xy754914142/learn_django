@@ -5,14 +5,14 @@
 
 {% block content %}
     <ol class="breadcrumb">
-          <li><a href="{% url 'mian_html' %}">Home</a></li>
-          <li class="active">学生列表</li>
+        <li><a href="{% url 'mian_html' %}">Home</a></li>
+        <li class="active">学生列表</li>
     </ol>
     <div style="padding: 0 10px 10px 10px">
-    <p><a href="{% url 'add_student' %}" class="btn btn-info">添加</a>
-        <a id="add_modal" class="btn btn-primary">对话框添加</a></p>
+        <p><a href="{% url 'add_student' %}" class="btn btn-info">添加</a>
+            <a id="add_modal" class="btn btn-primary">对话框添加</a></p>
     </div>
-    <table  class="table table-bordered table-hover">
+    <table class="table table-bordered table-hover">
         <thead>
         <tr>
             <td>ID</td>
@@ -22,22 +22,23 @@
         </tr>
         </thead>
         <tbody>
-                {% for student in student_list %}
-                <tr>
-                    <td> {{ student.id }} </td>
-                    <td> {{ student.stu_name }} </td>
-                    <td clsid="{{ student.classes_id }}"> {{ student.classes.class_name }} </td>
-                    <td> <a href="{% url 'edit_student' student.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                        |
-                        <a class="show_editWindow"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 对话框</a>
-                         |
-                        <a href="{% url 'del_student' student.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
-                         |
-                        <a class="del_maodal_show"><i class="fa fa-trash" aria-hidden="true"></i> 对话框</a>
-                    </td>
+        {% for student in student_list %}
+            <tr>
+                <td> {{ student.id }} </td>
+                <td> {{ student.stu_name }} </td>
+                <td clsid="{{ student.classes_id }}"> {{ student.classes.class_name }} </td>
+                <td><a href="{% url 'edit_student' student.id %}"><i class="fa fa-pencil-square-o"
+                                                                     aria-hidden="true"></i></a>
+                    |
+                    <a class="show_editWindow"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 对话框</a>
+                    |
+                    <a href="{% url 'del_student' student.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                    |
+                    <a class="del_maodal_show"><i class="fa fa-trash" aria-hidden="true"></i> 对话框</a>
+                </td>
 
-                </tr>
-                {% endfor %}
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 
@@ -46,53 +47,54 @@
 
 
 
-<div class="shadow hide" id="shadow_window"></div>
+    <div class="shadow hide" id="shadow_window"></div>
 
-<div class="mymodal hide" id="modal_window">
-    <div style="margin-left: 50px;margin-top:50px">
-    <p>学生姓名:<input type="text" id="add_student_name"/></p>
-    班级名称:<select id="add_class_name">
-                {% for r_class in class_list %}
-                    <option value="{{ r_class.id }}">{{ r_class.class_name }}</option>
-                {% endfor %}
-            </select>
-    <p><input type="button" id="add_btn" value="添加"/>
-        <input type="button" class="cancel_btn" value="取消"/></p>
-    <p id="error_mess_add" style="color:red"></p>
-    </div>
-</div>
-
-<div class="mymodal hide" id="modal_window_edit">
-    <div style="margin-left: 50px;margin-top:50px">
-        <p id="edit_stu_id" style="display: none"></p>
-        <p>学生名称：<input type="text" id="edit_stu_name"/></p>
-        <select id="select_class">
+    <div class="mymodal hide" id="modal_window">
+        <div style="margin-left: 50px;margin-top:50px">
+            <p>学生姓名:<input type="text" id="add_student_name"/></p>
+            班级名称:<select id="add_class_name">
             {% for r_class in class_list %}
                 <option value="{{ r_class.id }}">{{ r_class.class_name }}</option>
             {% endfor %}
         </select>
-        <input type="button" id="edit_btn" value="修改"/>
-        <input type="button" class="cancel_btn" value="取消"/>
-        <p style="color:red" id="edit_erro"></p>
-    </div>
-</div>
-
-<div class="mymodal hide" id="modal_window_del">
-    <div style="margin-left: 10px;margin-top:50px">
-        <h3>正在删除</h3>
-        <p>ID:<span id="del_stu_id"></span>班级:<span id="del_class_name"></span>姓名:<span id="del_stu_name"></span> 的学生！</p>
-        <input type="button" id="del_button" value="删除"/>
-        <input type="button" class="cancel_btn" value="取消"/>
-        <p id="del_erro" style="display: none"></p>
+            <p><input type="button" id="add_btn" value="添加"/>
+                <input type="button" class="cancel_btn" value="取消"/></p>
+            <p id="error_mess_add" style="color:red"></p>
+        </div>
     </div>
 
-</div>
+    <div class="mymodal hide" id="modal_window_edit">
+        <div style="margin-left: 50px;margin-top:50px">
+            <p id="edit_stu_id" style="display: none"></p>
+            <p>学生名称：<input type="text" id="edit_stu_name"/></p>
+            <select id="select_class">
+                {% for r_class in class_list %}
+                    <option value="{{ r_class.id }}">{{ r_class.class_name }}</option>
+                {% endfor %}
+            </select>
+            <input type="button" id="edit_btn" value="修改"/>
+            <input type="button" class="cancel_btn" value="取消"/>
+            <p style="color:red" id="edit_erro"></p>
+        </div>
+    </div>
 
-<nav aria-label="Page navigation">
-  <ul class="pagination">
-      {{ page_info.page|safe }}
-  </ul>
-</nav>
+    <div class="mymodal hide" id="modal_window_del">
+        <div style="margin-left: 10px;margin-top:50px">
+            <h3>正在删除</h3>
+            <p>ID:<span id="del_stu_id"></span>班级:<span id="del_class_name"></span>姓名:<span id="del_stu_name"></span>
+                的学生！</p>
+            <input type="button" id="del_button" value="删除"/>
+            <input type="button" class="cancel_btn" value="取消"/>
+            <p id="del_erro" style="display: none"></p>
+        </div>
+
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {{ page_info.page|safe }}
+        </ul>
+    </nav>
 
 {% endblock content %}
 
